@@ -171,6 +171,12 @@ h3.sub{font-size:15px;margin:18px 0 6px;padding-top:12px;border-top:1px dashed v
 .chk.box{height:var(--h);border:1px solid #b9c0c8;border-radius:7px;padding:0 10px;background:#fff;font-size:13px}
 @media (max-width:1100px){.xrow.park{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:560px){.xrow.park{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bldbody{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 18px;align-items:start}
+@media (max-width:1000px){.bldbody{grid-template-columns:1fr}}
+.bldbody #groups{grid-template-columns:1fr}
+.bxrow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.05fr) minmax(0,.95fr) minmax(0,.5fr) minmax(0,1.3fr) 36px;gap:8px;align-items:end;margin-bottom:6px}
+@media (max-width:560px){.bxrow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:561px){.bxrow + .bxrow .lbl{display:none}}
 
 </style>
 
@@ -269,15 +275,29 @@ h3.sub{font-size:15px;margin:18px 0 6px;padding-top:12px;border-top:1px dashed v
       <label class="f"><span class="lbl">חיבורי דירות לפי גודל – מחושב</span><span class="ro" id="connsTotal" title="כמות דירות לכל גודל חיבור">—</span></label>
       <label class="f"><span class="lbl">כתובת החיבור להזמנה</span><span class="ro" id="addrBld" title="מהות + בניין + פרויקט + עיר + קוד ראש צוות">—</span></label>
     </div>
-    <h3 class="sub">מקבצי קומות ודירות</h3>
-    <details class="help"><summary>הסבר</summary><div>
-      כל מקבץ הוא טווח קומות זהות (מקומה עד קומה, קרקע = 0). בתוך מקבץ מגדירים סוגי דירות: כמות בקומה, מס׳ חדרים, שטח (לא חובה) וגודל חיבור.<br>
-      גודל חיבור ברירת מחדל: 2–4 חדרים – 3X25A תמיד (בלי קשר לשטח). 5 חדרים – 3X25A, ומשטח 120 מ״ר ומעלה – 3X40A. 6 חדרים ומעלה – 3X40A אוטומטית. אפשר לשנות ידנית (לדירות מיוחדות 3X63A ומעלה).<br>
-      לשינוי בקומה בודדת – מגדירים מקבץ של קומה אחת. אסור שמקבצים יחפפו.
-    </div></details>
-    <div id="groups" style="margin-top:10px"></div>
-    <button class="btn small" id="addGroup" title="הוספת מקבץ קומות חדש">＋ הוספת מקבץ</button>
-    <div class="muted" id="totals" style="margin-top:8px"></div>
+    <div class="bldbody">
+    <div class="bcol">
+      <h3 class="sub">מקבצי קומות ודירות</h3>
+      <details class="help"><summary>הסבר</summary><div>
+        כל מקבץ הוא טווח קומות זהות (מקומה עד קומה, קרקע = 0). בתוך מקבץ מגדירים סוגי דירות: כמות בקומה, מס׳ חדרים, שטח (לא חובה) וגודל חיבור.<br>
+        גודל חיבור ברירת מחדל: 2–4 חדרים – 3X25A תמיד (בלי קשר לשטח). 5 חדרים – 3X25A, ומשטח 120 מ״ר ומעלה – 3X40A. 6 חדרים ומעלה – 3X40A אוטומטית. אפשר לשנות ידנית (לדירות מיוחדות 3X63A ומעלה).<br>
+        לשינוי בקומה בודדת – מגדירים מקבץ של קומה אחת. אסור שמקבצים יחפפו.
+      </div></details>
+      <div id="groups" style="margin-top:10px"></div>
+      <button class="btn small" id="addGroup" title="הוספת מקבץ קומות חדש">＋ הוספת מקבץ</button>
+      <div class="muted" id="totals" style="margin-top:8px"></div>
+    </div>
+    <div class="bcol">
+      <h3 class="sub">מסחר, משרדים ומבני ציבור בבניין</h3>
+      <details class="help"><summary>הסבר</summary><div>
+        חיבורי מסחר, משרדים, מבני ציבור או אחר שנמצאים בבניין הזה. אפשר כמה חיבורים בבניין.<br>
+        כל שינוי כאן מתעדכן אוטומטית בקובייה 4 (מסחר, משרדים ומבני ציבור), וכל שינוי שם מתעדכן כאן.<br>
+        <b>שיוך:</b> "לבניין" – חיבור של הבניין. "כללי לפרויקט" – חיבור אחד לכל הפרויקט. באותו סוג אי אפשר לשלב את שניהם.
+      </div></details>
+      <div id="bldX" style="margin-top:10px"></div>
+      <button class="btn small" id="addBldX" title="הוספת חיבור מסחר / משרדים / מבנה ציבור בבניין זה">＋ חיבור בבניין</button>
+    </div>
+    </div>
   </div>
   </div>
 
@@ -346,7 +366,7 @@ h3.sub{font-size:15px;margin:18px 0 6px;padding-top:12px;border-top:1px dashed v
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V3';
+const VERSION = 'V4';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
 const FORMAT_ID = 'tiktin-iec-orders';
@@ -675,12 +695,37 @@ function renderXList(boxId){
       if(f==='type'||f==='assign'){ renderExtras(); recalc(); return; }
       const d=r.querySelector('[data-xf=desc]'); d.placeholder=xAuto(x);
       if(f==='loc'){ const o=r.querySelector('[data-xf=open]'); o.disabled=!canInb(x); if(!canInb(x)) o.value='sep'; }
-      recalc(); }));
+      renderBldX(); recalc(); }));
     r.querySelector('[data-act=delx]').addEventListener('click',()=>{ PROJ.extras.splice(+r.dataset.x,1); renderExtras(); recalc(); });
   });
   enhance(box);
 }
-function renderExtras(){ renderPark(); renderXList('extras'); }
+function renderExtras(){ renderPark(); renderXList('extras'); renderBldX(); }
+/* מסחר / משרדים / מבני ציבור בתוך קוביית הבניין – אותם נתונים כמו בקובייה 4, מתעדכנים בשני הכיוונים */
+function inBld(x,i){ return String(x.loc||'').split(/[+,]/).some(t=>t.trim() && bldIndexOf(t)===i); }
+function renderBldX(){
+  const box=document.getElementById('bldX'); if(!box) return;
+  const items=PROJ.extras.map((x,i)=>[x,i]).filter(([x])=>inBld(x,PROJ.active));
+  if(!items.length){ box.innerHTML='<div class="muted" style="margin-bottom:8px">אין חיבורי מסחר, משרדים או מבני ציבור בבניין זה.</div>'; return; }
+  box.innerHTML = items.map(([x,i])=>`<div class="bxrow" data-x="${i}">
+      <label class="f"><span class="lbl">סוג</span>${fld(`<select data-xf="type" data-def="com" title="מסחר, משרדים, מבנה ציבור או אחר">${Object.entries(XTYPES).filter(([k])=>k!=='park'&&k!=='ev').map(([k,v])=>`<option value="${k}" ${x.type===k?'selected':''}>${v.l}</option>`).join('')}</select>`)}</label>
+      <label class="f"><span class="lbl">שיוך החיבור</span>${fld(`<select data-xf="assign" data-def="${asgLock(x)||'bld'}" title="${asgLock(x)?'באותו סוג לא ניתן לשלב לבניין וכללי':'חיבור לבניין, או חיבור כללי לכל הפרויקט'}"><option value="bld" ${!xOnProj(x)?'selected':''} ${asgLock(x)==='project'?'disabled':''}>לבניין</option><option value="project" ${xOnProj(x)?'selected':''} ${asgLock(x)==='bld'?'disabled':''}>כללי לפרויקט</option></select>`)}</label>
+      <label class="f"><span class="lbl">גודל חיבור</span>${fld(`<select data-xf="size" data-def="" title="גודל החיבור התלת פאזי">${sizeOpts(x.size)}</select>`)}</label>
+      <label class="f"><span class="lbl">כמות</span>${fld(`<input data-xf="qty" inputmode="numeric" value="${esc(x.qty)}" title="מספר חיבורים בגודל זה">`)}</label>
+      <label class="f"><span class="lbl">אופן פתיחה</span>${openSel(x)}</label>
+      <button class="del" data-act="delx" title="מחיקת החיבור">✕</button>
+    </div>`).join('');
+  box.querySelectorAll('.bxrow').forEach(r=>{ const x=PROJ.extras[+r.dataset.x];
+    r.querySelectorAll('[data-xf]').forEach(el=>bind(el,()=>{ const f=el.dataset.xf; x[f]=el.value;
+      if(f==='type'){ const L=asgLock(x); if(L) x.assign=L; }
+      if(f==='type'||f==='assign'){ renderExtras(); recalc(); return; }
+      renderXList('extras'); recalc(); }));
+    r.querySelector('[data-act=delx]').addEventListener('click',()=>{ PROJ.extras.splice(+r.dataset.x,1); renderExtras(); recalc(); });
+  });
+  enhance(box);
+}
+document.getElementById('addBldX').addEventListener('click',()=>{ const x=Object.assign(newExtra(),{type:'com',assign:'bld',loc:locShort(bldName(S,PROJ.active))}); PROJ.extras.push(x); const L=asgLock(x); if(L) x.assign=L; renderExtras(); recalc(); });
+
 document.getElementById('addExtra').addEventListener('click',()=>{ const x=Object.assign(newExtra(),{type:'com',assign:'bld'}); PROJ.extras.push(x); const L=asgLock(x); if(L) x.assign=L; renderExtras(); recalc(); });
 
 /* ---------- 5. temp ---------- */
