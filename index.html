@@ -140,7 +140,7 @@ main{grid-template-columns:minmax(0,1fr) !important}
 .ro{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .ro.bad{border-color:var(--red);color:var(--red)}
 #addrBld{font-weight:500;font-size:13px}
-.xrow{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,1.6fr) minmax(0,.95fr) minmax(0,.55fr) minmax(0,1.1fr) minmax(0,1.4fr) 36px;gap:8px;align-items:end;margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.xrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr) minmax(0,1.5fr) minmax(0,.95fr) minmax(0,.55fr) minmax(0,1.05fr) minmax(0,1.3fr) 36px;gap:8px;align-items:end;margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
 @media (max-width:1100px){.xrow{grid-template-columns:repeat(4,minmax(0,1fr))}.xrow .del{justify-self:start}}
 @media (max-width:560px){.xrow{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .drow{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.3fr) minmax(0,2.6fr) 40px minmax(0,.7fr);gap:8px;align-items:end;margin-bottom:6px}
@@ -157,6 +157,19 @@ main{grid-template-columns:minmax(0,1fr) !important}
 @media (min-width:701px){.drow + .drow .lbl{display:none}.drow + .drow{margin-top:-2px}}
 @media (min-width:1101px){.xrow + .xrow .lbl{display:none}}
 @media (max-width:560px){header{flex-wrap:wrap;gap:6px 10px}header h1{flex:1 1 55%}header .fz{order:3}header .ver{order:4}}
+/* מסגרת בניין: הכרטיסיות + כל נתוני הבניין בתוך מסגרת אחת – הכול שייך לבניין הנבחר */
+.bldwrap{margin-bottom:14px;border:2px solid var(--red);border-radius:12px;background:#fff;box-shadow:0 2px 10px rgba(200,32,47,.08);overflow:hidden}
+.bldwrap .tabs{padding:10px 12px 8px;background:#fdf3f3;border-bottom:1px solid #f1c9cc;gap:6px}
+.bldwrap .tab{height:34px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.bldwrap .tab.on{background:var(--red);border-color:var(--red);color:#fff}
+.bldwrap .tab.on .tx{background:rgba(255,255,255,.25);color:#fff}
+.bldwrap .tab.add{border-style:dashed}
+.card.bldcard{border:0;border-radius:0;margin-bottom:0}
+.bldnm{color:var(--red)}
+h3.sub{font-size:15px;margin:18px 0 6px;padding-top:12px;border-top:1px dashed var(--line);display:flex;align-items:center;gap:8px}
+.xrow.park{grid-template-columns:minmax(0,1.6fr) minmax(0,1.1fr) minmax(0,.95fr) minmax(0,.55fr) minmax(0,1.05fr) minmax(0,1.6fr) 36px}
+@media (max-width:1100px){.xrow.park{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:560px){.xrow.park{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 </style>
 
@@ -221,7 +234,6 @@ main{grid-template-columns:minmax(0,1fr) !important}
   </div>
 </div>
 
-<div class="tabs" id="tabs"></div>
 <main>
 <section id="inputs">
   <div class="card">
@@ -234,8 +246,10 @@ main{grid-template-columns:minmax(0,1fr) !important}
     <div class="grid g4" id="projGrid"></div>
   </div>
 
-  <div class="card tabcard">
-    <h2><span class="num">2</span>נתוני הבניין</h2>
+  <div class="bldwrap">
+  <div class="tabs" id="tabs"></div>
+  <div class="card bldcard">
+    <h2><span class="num">2</span>נתוני הבניין, קומות ודירות – <span class="bldnm" id="bldTitle"></span></h2>
     <details class="help"><summary>הסבר</summary><div>
       לכל בניין נפתחת הזמנה קבועה נפרדת באתר. מוסיפים בניין בלשונית "＋ בניין", או קולטים את כל הבניינים מקובץ תמהיל (📥 קליטה מקובץ).<br>
       <b>מיקום מונים</b> – נבחר אוטומטית לפי כלל המשרד: עד 100 דירות – ריכוז מונים (חדר מונים), מעל 100 – פיזור מונים בקומות. אפשר לשנות; הבחירה עוברת במפורש להזמנה באתר.<br>
@@ -254,10 +268,7 @@ main{grid-template-columns:minmax(0,1fr) !important}
       <label class="f"><span class="lbl">חיבורי דירות לפי גודל – מחושב</span><span class="ro" id="connsTotal" title="כמות דירות לכל גודל חיבור">—</span></label>
       <label class="f"><span class="lbl">כתובת החיבור להזמנה</span><span class="ro" id="addrBld" title="מהות + בניין + פרויקט + עיר + קוד ראש צוות">—</span></label>
     </div>
-  </div>
-
-  <div class="card tabcard">
-    <h2><span class="num">3</span>מקבצי קומות ודירות</h2>
+    <h3 class="sub">מקבצי קומות ודירות</h3>
     <details class="help"><summary>הסבר</summary><div>
       כל מקבץ הוא טווח קומות זהות (מקומה עד קומה, קרקע = 0). בתוך מקבץ מגדירים סוגי דירות: כמות בקומה, מס׳ חדרים, שטח (לא חובה) וגודל חיבור.<br>
       גודל חיבור ברירת מחדל: 2–4 חדרים – 3X25A תמיד (בלי קשר לשטח). 5 חדרים – 3X25A, ומשטח 120 מ״ר ומעלה – 3X40A. 6 חדרים ומעלה – 3X40A אוטומטית. אפשר לשנות ידנית (לדירות מיוחדות 3X63A ומעלה).<br>
@@ -267,17 +278,29 @@ main{grid-template-columns:minmax(0,1fr) !important}
     <button class="btn small" id="addGroup" title="הוספת מקבץ קומות חדש">＋ הוספת מקבץ</button>
     <div class="muted" id="totals" style="margin-top:8px"></div>
   </div>
+  </div>
 
   <div class="card">
-    <h2><span class="num">4</span>חניון, מסחר וחיבורים נפרדים</h2>
+    <h2><span class="num">3</span>חניון / מרתף משותף</h2>
     <details class="help"><summary>הסבר</summary><div>
-      כל שורה היא חיבור נוסף בפרויקט – חניון / מרתף משותף, מסחר, שטחי עירייה, תעסוקה וכו׳.<br>
-      <b>שיוך:</b> חניון או מרתף משותף – תמיד לכל הפרויקט. מסחר ושטחים אחרים – לכל הפרויקט או לבניין מסוים (אפשר כמה בניינים, למשל C+D).<br>
-      <b>אופן פתיחה:</b> "הזמנה נפרדת" – נפתחת הזמנה משלו (כך נעשה בנהוראי). "בהזמנת הבניין" – החיבור מתווסף להזמנה של הבניין המשויך.<br>
-      <b>תיאור</b> – נוצר אוטומטית (למשל "מסחר C+D") וניתן לכתוב תיאור אחר.
+      חיבור החניון / המרתף המשותף משויך תמיד <b>לכל הפרויקט</b>. בשדה "החיבור יהיה בבניין" מציינים באיזה בניין ימוקם החיבור (חדר מונים / לוח).<br>
+      <b>אופן פתיחה:</b> "הזמנה נפרדת" – הזמנה משלו (כך נעשה בנהוראי). "בהזמנת הבניין" – החיבור נכלל בהזמנה של הבניין שבו הוא ממוקם.
+    </div></details>
+    <div id="parks" style="margin-top:10px"></div>
+    <button class="btn small" id="addPark" title="הוספת חיבור חניון / מרתף משותף">＋ הוספת חיבור חניון</button>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">4</span>מסחר, משרדים ומבני ציבור</h2>
+    <details class="help"><summary>הסבר</summary><div>
+      כל שורה היא חיבור למסחר, משרדים, מבנה ציבור או אחר – בכל אחד מהבניינים או במרתף.<br>
+      <b>מיקום:</b> שם הבניין (אפשר כמה בניינים עם +, למשל C+D) או "מרתף".<br>
+      <b>שיוך החיבור:</b> "לבניין" – חיבור של הבניין שבו נמצא השטח. "כללי – לכל הפרויקט" – חיבור אחד לכל הפרויקט. באותו סוג אי אפשר לשלב חיבורים לפי בניין עם חיבור כללי.<br>
+      <b>אופן פתיחה:</b> "הזמנה נפרדת" או "בהזמנת הבניין" (רק כשהמיקום הוא בניין).<br>
+      <b>תיאור</b> – נוצר אוטומטית (למשל "מסחר C+D", "משרדים במרתף") וניתן לכתוב תיאור אחר.
     </div></details>
     <div id="extras" style="margin-top:10px"></div>
-    <button class="btn small" id="addExtra" title="הוספת חיבור נוסף">＋ הוספת חיבור</button>
+    <button class="btn small" id="addExtra" title="הוספת חיבור מסחר / משרדים / מבנה ציבור">＋ הוספת חיבור</button>
   </div>
 
   <div class="card">
@@ -322,7 +345,7 @@ main{grid-template-columns:minmax(0,1fr) !important}
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V1';
+const VERSION = 'V2';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
 const FORMAT_ID = 'tiktin-iec-orders';
@@ -374,7 +397,7 @@ function defaultConn(rooms, area){
 /* גדלי חיבור להזמנות: ציבורי, חניון, מסחר, זמני – 3X40 עד 3X910 */
 const BIG = ['3x40','3x63','3x80','3x100','3x125','3x160','3x200','3x250','3x315','3x400','3x500','3x630','3x800','3x910'];
 const LEADERS = [['אביאל','רצ1'],['אלון','רצ2'],['אמיר','רצ3'],['ורדית','רצ4'],['טל','רצ5'],['יובל','רצ6'],['ליטל','רצ7'],['מור','רצ8'],['מורן','רצ9'],['מיטל','רצ10'],['מיכל .ו','רצ11'],['משה','רצ12'],['נדב','רצ13'],['נטלי','רצ14'],['נטע','רצ15'],['נתנאל','רצ16'],['סיוון','רצ17'],['עדן .נ.','רצ18'],['עדן .פ.','רצ19'],['ערבה','רצ20'],['קובי.ש.','רצ21'],['תהילה','רצ22'],['תומר','רצ23'],['תמר.פ','רצ24']];
-const XTYPES = {park:{l:'חניון / מרתף משותף',d:'חניון משותף'}, com:{l:'מסחר',d:'מסחר'}, muni:{l:'שטחי עירייה / ציבור',d:'שטחי עירייה'}, emp:{l:'תעסוקה / משרדים',d:'שטחי תעסוקה'}, other:{l:'אחר',d:'חיבור נוסף'}};
+const XTYPES = {park:{l:'חניון / מרתף משותף',d:'חניון משותף'}, com:{l:'מסחר',d:'מסחר'}, office:{l:'משרדים',d:'משרדים'}, public:{l:'מבנה ציבור',d:'מבנה ציבור'}, other:{l:'אחר',d:'חיבור נוסף'}};
 const DOCS = [
   {k:'decl',   l:'תצהיר בעל חטיבת קרקע',       req:'חובה'},
   {k:'plan',   l:'תכנית הגשה (גרמושקה)',        req:'חובה'},
@@ -421,12 +444,12 @@ function projFrom(o){
   p.project={...d.project, ...(o.project||{})};
   p.list=(Array.isArray(o.list)&&o.list.length?o.list:d.list).map((b,i)=>Object.assign(defaultBuilding(i),b));
   p.active=Math.min(Math.max(0,+o.active||0),p.list.length-1);
-  p.extras=Array.isArray(o.extras)?o.extras.map(x=>Object.assign(newExtra(),x)):[];
+  p.extras=Array.isArray(o.extras)?o.extras.map(x=>{ const y=Object.assign(newExtra(),x); if(x.blds!=null&&x.loc==null) y.loc=x.blds; if(y.type==='muni') y.type='public'; if(y.type==='emp') y.type='office'; if(!XTYPES[y.type]) y.type='other'; if(y.type==='park') y.assign='project'; delete y.blds; return y; }):[];
   p.temp={...d.temp,...(o.temp||{})}; p.decl={...d.decl,...(o.decl||{})}; p.send={...d.send,...(o.send||{})};
   p.docs={...d.docs}; Object.keys(o.docs||{}).forEach(k=>{ p.docs[k]={...d.docs[k],...o.docs[k]}; });
   return p;
 }
-function newExtra(){ return {type:'park', assign:'project', blds:'', desc:'', size:'', qty:'1', open:'sep', note:''}; }
+function newExtra(){ return {type:'com', assign:'bld', loc:'', desc:'', size:'', qty:'1', open:'sep', note:''}; }
 let PROJ = defaultProj();
 try{ const s=localStorage.getItem('tiktin_iec_orders'); if(s) PROJ=projFrom(JSON.parse(s)); }catch(e){}
 let S = PROJ.list[PROJ.active];
@@ -573,44 +596,70 @@ function compute(b){
 }
 const connStr = bc => CONNS.filter(c=>bc[c]).map(c=>`${bc[c]} × ${c.toUpperCase()}`).join('; ');
 
-/* ---------- 4. extras ---------- */
+/* ---------- 3+4. חניון | מסחר, משרדים ומבני ציבור ---------- */
 function bldOptsList(){ return PROJ.list.map((b,i)=>bldName(b,i)); }
-function renderExtras(){
-  const box=document.getElementById('extras');
-  if(!PROJ.extras.length){ box.innerHTML='<div class="muted" style="margin-bottom:8px">אין חיבורים נוספים. להוספת חניון, מסחר או שטחים אחרים – "＋ הוספת חיבור".</div>'; return; }
-  const dl=`<datalist id="bldList">${bldOptsList().map(n=>`<option value="${esc(n.replace(/^בניין\s*/,''))}">`).join('')}</datalist>`;
-  box.innerHTML = dl + PROJ.extras.map((x,i)=>{
-    const park=x.type==='park', onProj=park||x.assign==='project';
-    return `<div class="xrow" data-x="${i}">
-      <label class="f"><span class="lbl">סוג החיבור</span>${fld(`<select data-xf="type" data-def="park" title="סוג השטח המוזן">${Object.entries(XTYPES).map(([k,v])=>`<option value="${k}" ${x.type===k?'selected':''}>${v.l}</option>`).join('')}</select>`)}</label>
-      <label class="f"><span class="lbl">שיוך</span>${fld(`<select data-xf="assign" data-def="project" ${park?'disabled':''} title="${park?'חניון / מרתף משותף משויך תמיד לכל הפרויקט':'כל הפרויקט או בניין מסוים'}"><option value="project" ${onProj?'selected':''}>כל הפרויקט</option><option value="bld" ${!onProj?'selected':''}>בניין מסוים</option></select>`)}</label>
-      <label class="f"><span class="lbl">בניינים</span>${fld(`<input data-xf="blds" list="bldList" value="${esc(x.blds)}" ${onProj?'disabled':''} title="שם הבניין, או כמה בניינים עם +, למשל C+D">`)}</label>
+const isPark = x => x.type==='park';
+const xOnProj = x => isPark(x) || x.assign!=='bld';
+const locShort = s => String(s||'').trim().replace(/^בניין\s*/,'');
+const isBase = x => /^מרתף/.test(String(x.loc||'').trim());
+function bldIndexOf(s){
+  const tok=String(s||'').split(/[+,]/)[0].trim(); if(!tok) return -1;
+  const names=bldOptsList();
+  let i=names.findIndex(n=>n===tok); if(i<0) i=names.findIndex(n=>locShort(n)===locShort(tok));
+  return i;
+}
+const canInb = x => bldIndexOf(x.loc)>=0;
+/* באותו סוג (מסחר / משרדים / מבנה ציבור) – או חיבורים לפי בניין או חיבור כללי לכל הפרויקט, לא שניהם */
+function asgLock(x){ if(isPark(x)) return ''; const o=PROJ.extras.filter(y=>y!==x && !isPark(y) && y.type===x.type);
+  if(o.some(y=>!xOnProj(y))) return 'bld'; if(o.some(xOnProj)) return 'project'; return ''; }
+const xInb = x => x.open==='inb' && canInb(x);
+function xAuto(x){
+  if(isPark(x)) return 'חניון משותף';
+  const l=String(x.loc||'').trim();
+  return XTYPES[x.type].d + (!l ? '' : isBase(x) ? ' במרתף' : ' '+locShort(l));
+}
+function xDesc(x){ return (String(x.desc||'').trim()||xAuto(x)).replace(/^הזמנה\s*ל/,'').trim(); }
+function xLocTxt(x){ const l=String(x.loc||'').trim(); return !l ? (isPark(x)?'לא נקבע':'–') : isBase(x) ? 'מרתף' : 'בניין '+locShort(l); }
+function xShiyuch(x){ return xOnProj(x) ? 'כל הפרויקט' : xLocTxt(x); }
+function locList(withBase){ return `<datalist id="${withBase?'locListB':'locList'}">${bldOptsList().map(n=>`<option value="${esc(locShort(n))}">`).join('')}${withBase?'<option value="מרתף">':''}</datalist>`; }
+const openSel = x => fld(`<select data-xf="open" data-def="sep" ${canInb(x)?'':'disabled'} title="הזמנה נפרדת, או בתוך ההזמנה של הבניין שבו נמצא החיבור"><option value="sep" ${!xInb(x)?'selected':''}>הזמנה נפרדת</option><option value="inb" ${xInb(x)?'selected':''}>בהזמנת הבניין</option></select>`);
+function renderXList(boxId, park){
+  const box=document.getElementById(boxId);
+  const items=PROJ.extras.map((x,i)=>[x,i]).filter(([x])=>isPark(x)===park);
+  if(!items.length){ box.innerHTML=`<div class="muted" style="margin-bottom:8px">${park?'אין חיבור חניון. להוספה – "＋ הוספת חיבור חניון".':'אין חיבורי מסחר, משרדים או מבני ציבור. להוספה – "＋ הוספת חיבור".'}</div>`; return; }
+  box.innerHTML = locList(!park) + items.map(([x,i])=> park ? `<div class="xrow park" data-x="${i}">
+      <label class="f wide"><span class="lbl">תיאור (ריק = אוטומטי)</span>${fld(`<input data-xf="desc" value="${esc(x.desc)}" placeholder="${esc(xAuto(x))}" title="יופיע בכתובת החיבור אחרי 'הזמנה ל'">`)}</label>
+      <label class="f"><span class="lbl">החיבור יהיה בבניין</span>${fld(`<input data-xf="loc" list="locList" value="${esc(x.loc)}" title="באיזה בניין ימוקם חיבור החניון (לוח / חדר מונים). החיבור משויך לכל הפרויקט">`)}</label>
+      <label class="f"><span class="lbl">גודל חיבור</span>${fld(`<select data-xf="size" data-def="" title="גודל החיבור התלת פאזי">${sizeOpts(x.size)}</select>`)}</label>
+      <label class="f"><span class="lbl">כמות</span>${fld(`<input data-xf="qty" inputmode="numeric" value="${esc(x.qty)}" title="מספר חיבורים בגודל זה">`)}</label>
+      <label class="f"><span class="lbl">אופן פתיחה</span>${openSel(x)}</label>
+      <label class="f wide"><span class="lbl">הערות</span>${fld(`<input data-xf="note" value="${esc(x.note)}" title="הערה שתיכנס להערות ההזמנה">`)}</label>
+      <button class="del" data-act="delx" title="מחיקת החיבור">✕</button>
+    </div>` : `<div class="xrow" data-x="${i}">
+      <label class="f"><span class="lbl">סוג</span>${fld(`<select data-xf="type" data-def="com" title="מסחר, משרדים, מבנה ציבור או אחר">${Object.entries(XTYPES).filter(([k])=>k!=='park').map(([k,v])=>`<option value="${k}" ${x.type===k?'selected':''}>${v.l}</option>`).join('')}</select>`)}</label>
+      <label class="f"><span class="lbl">מיקום (בניין / מרתף)</span>${fld(`<input data-xf="loc" list="locListB" value="${esc(x.loc)}" title="בניין, כמה בניינים עם + (למשל C+D), או מרתף">`)}</label>
+      <label class="f"><span class="lbl">שיוך החיבור</span>${fld(`<select data-xf="assign" data-def="${asgLock(x)||'bld'}" title="${asgLock(x)?'כבר הוזן '+XTYPES[x.type].l+' '+(asgLock(x)==='bld'?'לבניין':'כללי לכל הפרויקט')+' – לא ניתן לשלב לבניין וכללי באותו סוג':'חיבור לבניין שבו נמצא השטח, או חיבור כללי לכל הפרויקט'}"><option value="bld" ${!xOnProj(x)?'selected':''} ${asgLock(x)==='project'?'disabled':''}>לבניין</option><option value="project" ${xOnProj(x)?'selected':''} ${asgLock(x)==='bld'?'disabled':''}>כללי לפרויקט</option></select>`)}</label>
       <label class="f wide"><span class="lbl">תיאור (ריק = אוטומטי)</span>${fld(`<input data-xf="desc" value="${esc(x.desc)}" placeholder="${esc(xAuto(x))}" title="יופיע בכתובת החיבור אחרי 'הזמנה ל'">`)}</label>
       <label class="f"><span class="lbl">גודל חיבור</span>${fld(`<select data-xf="size" data-def="" title="גודל החיבור התלת פאזי">${sizeOpts(x.size)}</select>`)}</label>
       <label class="f"><span class="lbl">כמות</span>${fld(`<input data-xf="qty" inputmode="numeric" value="${esc(x.qty)}" title="מספר חיבורים בגודל זה">`)}</label>
-      <label class="f"><span class="lbl">אופן פתיחה</span>${fld(`<select data-xf="open" data-def="sep" ${onProj?'disabled':''} title="הזמנה נפרדת, או בתוך ההזמנה של הבניין המשויך"><option value="sep" ${x.open!=='inb'||onProj?'selected':''}>הזמנה נפרדת</option><option value="inb" ${x.open==='inb'&&!onProj?'selected':''}>בהזמנת הבניין</option></select>`)}</label>
+      <label class="f"><span class="lbl">אופן פתיחה</span>${openSel(x)}</label>
       <label class="f wide"><span class="lbl">הערות</span>${fld(`<input data-xf="note" value="${esc(x.note)}" title="הערה שתיכנס להערות ההזמנה">`)}</label>
       <button class="del" data-act="delx" title="מחיקת החיבור">✕</button>
-    </div>`; }).join('');
+    </div>`).join('');
   box.querySelectorAll('.xrow').forEach(r=>{ const x=PROJ.extras[+r.dataset.x];
     r.querySelectorAll('[data-xf]').forEach(el=>bind(el,()=>{ const f=el.dataset.xf; x[f]=el.value;
-      if(f==='type'||f==='assign'){ if(x.type==='park') x.assign='project'; renderExtras(); }
-      else if(f==='blds'){ const d=r.querySelector('[data-xf=desc]'); d.placeholder=xAuto(x); }
+      if(f==='type'){ const L=asgLock(x); if(L) x.assign=L; }
+      if(f==='type'||f==='assign'){ renderExtras(); recalc(); return; }
+      const d=r.querySelector('[data-xf=desc]'); d.placeholder=xAuto(x);
+      if(f==='loc'){ const o=r.querySelector('[data-xf=open]'); o.disabled=!canInb(x); if(!canInb(x)) o.value='sep'; }
       recalc(); }));
     r.querySelector('[data-act=delx]').addEventListener('click',()=>{ PROJ.extras.splice(+r.dataset.x,1); renderExtras(); recalc(); });
   });
   enhance(box);
 }
-document.getElementById('addExtra').addEventListener('click',()=>{ const x=newExtra(); if(PROJ.extras.some(e=>e.type==='park')) x.type='com'; PROJ.extras.push(x); renderExtras(); recalc(); });
-function xOnProj(x){ return x.type==='park' || x.assign!=='bld'; }
-function xAuto(x){ const b=String(x.blds||'').trim(); return XTYPES[x.type].d + (!xOnProj(x)&&b? ' '+b : ''); }
-function xDesc(x){ return (String(x.desc||'').trim()||xAuto(x)).replace(/^הזמנה\s*ל/,'').trim(); }
-function bldIndexOf(s){
-  const tok=String(s||'').split(/[+,]/)[0].trim(); if(!tok) return -1;
-  const names=bldOptsList();
-  let i=names.findIndex(n=>n===tok); if(i<0) i=names.findIndex(n=>n.replace(/^בניין\s*/,'')===tok.replace(/^בניין\s*/,''));
-  return i;
-}
+function renderExtras(){ renderXList('parks',true); renderXList('extras',false); }
+document.getElementById('addPark').addEventListener('click',()=>{ PROJ.extras.push(Object.assign(newExtra(),{type:'park',assign:'project'})); renderExtras(); recalc(); });
+document.getElementById('addExtra').addEventListener('click',()=>{ const x=Object.assign(newExtra(),{type:'com',assign:'bld'}); PROJ.extras.push(x); const L=asgLock(x); if(L) x.assign=L; renderExtras(); recalc(); });
 
 /* ---------- 5. temp ---------- */
 function renderTemp(){
@@ -676,19 +725,19 @@ function buildOrders(){
   const calcs=PROJ.list.map(b=>compute(b));
   PROJ.list.forEach((b,i)=>{
     const R=calcs[i], nm=bldName(b,i);
-    const inc=PROJ.extras.filter(x=>!xOnProj(x)&&x.open==='inb'&&bldIndexOf(x.blds)===i&&x.size);
+    const inc=PROJ.extras.filter(x=>xInb(x)&&bldIndexOf(x.loc)===i&&x.size);
     const parts=[]; if(connStr(R.byConn)) parts.push(connStr(R.byConn));
     if(b.pub) parts.push(`ציבורי: 1 × ${b.pub.toUpperCase()}`);
     inc.forEach(x=>parts.push(`${xDesc(x)}: ${Math.max(1,Math.round(num(x.qty,1)))} × ${x.size.toUpperCase()}`));
     const total=R.units+(b.pub?1:0)+inc.reduce((s,x)=>s+Math.max(1,Math.round(num(x.qty,1))),0);
-    let note=`פרויקט ${P.name||''}; ${nm}; ${R.units} דירות; ${R.meters}`+(b.pub?`; ציבורי ${SZ(b.pub)}`:'')+inc.map(x=>`; ${xDesc(x)} ${SZ(x.size)}`).join('');
+    let note=`פרויקט ${P.name||''}; ${nm}; ${R.units} דירות; ${R.meters}`+(b.pub?`; ציבורי ${SZ(b.pub)}`:'')+inc.map(x=>`; ${xDesc(x)} ${SZ(x.size)} (שיוך: ${xShiyuch(x)})`).join('');
     out.push({kind:'קבועה – מגורים', target:nm, addr:'הזמנה ל'+nm+tail, meters:R.meters, conns:parts.join('; '), total, note, bld:i});
   });
-  PROJ.extras.filter(x=>xOnProj(x)||x.open!=='inb').forEach(x=>{
+  const sepX=PROJ.extras.filter(x=>!xInb(x));
+  [...sepX.filter(x=>!isPark(x)), ...sepX.filter(isPark)].forEach(x=>{
     const q=Math.max(1,Math.round(num(x.qty,1))), d=xDesc(x);
-    const shiyuch = xOnProj(x)?'כל הפרויקט':('בניין '+String(x.blds||'').trim());
     out.push({kind:'קבועה – חיבור נפרד', target:d, addr:'הזמנה ל'+d+tail, meters:'—', conns:x.size?`${q} × ${x.size.toUpperCase()}`:'', total:q,
-      note:`פרויקט ${P.name||''}; ${XTYPES[x.type].l}; שיוך: ${shiyuch}`+(x.note?'; '+x.note:''), xt:x.type});
+      note:`פרויקט ${P.name||''}; ${XTYPES[x.type].l}; מיקום: ${xLocTxt(x)}; שיוך: ${xShiyuch(x)}`+(x.note?'; '+x.note:''), xt:x.type});
   });
   const nPerm=out.length;
   out.forEach((o,i)=>{ if(i>0) o.note+='; הזמנות קודמות בפרויקט: ימולאו בעת הפתיחה'; });
@@ -716,9 +765,11 @@ function issues(O){
     if(!b.pub) out.push(`${nm}: לא נבחר חיבור ציבורי`);
   });
   const names=PROJ.list.map(bldName); names.forEach((n,i)=>{ if(names.indexOf(n)!==i) out.push(`שם בניין כפול: ${n}`); });
-  PROJ.extras.forEach((x,i)=>{ const d=xDesc(x);
-    if(!x.size) out.push(`חיבור נוסף "${d}": לא נבחר גודל חיבור`);
-    if(!xOnProj(x)){ if(!String(x.blds||'').trim()) out.push(`חיבור נוסף "${d}": לא נבחר בניין`); else if(x.open==='inb'&&bldIndexOf(x.blds)<0) out.push(`חיבור נוסף "${d}": הבניין "${x.blds}" לא קיים בלשוניות`); } });
+  PROJ.extras.forEach((x,i)=>{ const d=xDesc(x), k=isPark(x)?'חיבור חניון':'חיבור';
+    if(!x.size) out.push(`${k} "${d}": לא נבחר גודל חיבור`);
+    if(!isPark(x) && !String(x.loc||'').trim()) out.push(`${k} "${d}": לא נבחר מיקום (בניין / מרתף)`);
+    if(String(x.loc||'').trim() && !isBase(x) && bldIndexOf(x.loc)<0) out.push(`${k} "${d}": הבניין "${x.loc}" לא קיים בלשוניות`); });
+  ['com','office','public','other'].forEach(t=>{ const r=PROJ.extras.filter(x=>x.type===t); if(r.some(xOnProj)&&r.some(x=>!xOnProj(x))) out.push(`${XTYPES[t].l}: הוזנו גם חיבור לבניין וגם חיבור כללי לכל הפרויקט – יש לבחור אחד מהשניים`); });
   O.orders.forEach(o=>{ if(o.len>100) out.push(`כתובת החיבור של "${o.target}" (${o.kind}) ארוכה מ־100 תווים (${o.len}) – המתכנן יחליט מה להשמיט; אין קיצור אוטומטי`); });
   ['decl','plan','poa'].forEach(k=>{ if(PROJ.docs[k].got!=='כן') out.push('מסמך חובה לא התקבל: '+DOCS.find(d=>d.k===k).l); });
   if(PROJ.temp.size && PROJ.docs.survey.got!=='כן') out.push('יש חיבור זמני – חובה תכנית מדידה של האתר');
@@ -743,8 +794,8 @@ function sections(O, iss){
     rows:PROJ.list.map((b,i)=>{ const R=O.calcs[i]; const other=Object.entries(R.byConn).filter(([c])=>!['3x25','3x40','3x63','3x80','3x100'].includes(c)).map(([c,n])=>`${n}×${c.toUpperCase()}`).join(' ');
       return [bldName(b,i), R.N, R.units, R.meters, R.byConn['3x25']||'', R.byConn['3x40']||'', R.byConn['3x63']||'', R.byConn['3x80']||'', R.byConn['3x100']||'', other, b.pub?b.pub.toUpperCase():'–']; }),
     note:'מיקום מונים אוטומטי לפי כלל המשרד: עד 100 דירות – ריכוז מונים, מעל 100 – פיזור מונים בקומות.'});
-  if(PROJ.extras.length) secs.push({title:'חניון, מסחר וחיבורים נפרדים', head:['סוג','שיוך','תיאור','גודל','כמות','אופן פתיחה','הערות'],
-    rows:PROJ.extras.map(x=>[XTYPES[x.type].l, xOnProj(x)?'כל הפרויקט':'בניין '+(x.blds||'–'), xDesc(x), x.size?x.size.toUpperCase():'–', Math.max(1,Math.round(num(x.qty,1))), xOnProj(x)||x.open!=='inb'?'הזמנה נפרדת':'בהזמנת הבניין', x.note||'–']), wide:2});
+  if(PROJ.extras.length) secs.push({title:'חניון, מסחר, משרדים ומבני ציבור', head:['סוג','מיקום','שיוך החיבור','תיאור','גודל','כמות','אופן פתיחה','הערות'],
+    rows:[...PROJ.extras.filter(isPark),...PROJ.extras.filter(x=>!isPark(x))].map(x=>[XTYPES[x.type].l, xLocTxt(x), xShiyuch(x), xDesc(x), x.size?x.size.toUpperCase():'–', Math.max(1,Math.round(num(x.qty,1))), xInb(x)?'בהזמנת הבניין':'הזמנה נפרדת', x.note||'–']), wide:3});
   secs.push({title:'רשימת ההזמנות לפתיחה – לפי הסדר', head:['#','סוג ההזמנה','מיועדת ל־','כתובת החיבור (תיאור)','תווים','מיקום מונים','פירוט חיבורים','הערות להזמנה'],
     rows:ord.map(o=>[o.seq,o.kind,o.target,o.addr,o.len>100?o.len+' ⚠':o.len,o.meters,o.conns||'–',o.note]), wide:3, small:true,
     note:'סדר הפתיחה: קודם כל ההזמנות הקבועות (בניין אחרי בניין, ואחריהם החיבורים הנפרדים) – ורק אחר כך שלוש ההזמנות של החיבור הזמני.\nמההזמנה השנייה ואילך – בהערות ההזמנה רושמים את מספרי כל ההזמנות הקודמות בפרויקט.\nכתובת החיבור: בוחרים יישוב, משאירים רחוב ומספר ריקים וכותבים את התיאור כפי שמופיע כאן. אם האתר דוחה את האורך – עוצרים והמתכנן מחליט מה להשמיט.'});
@@ -764,6 +815,7 @@ function recalc(){
   const R=compute(S);
   R.gErr.forEach((g,gi)=>{ const el=document.getElementById('gst'+gi); if(el) el.innerHTML = !g||g.empty? '' : g.err? `<span class="bad">${g.err}</span>` : `<span class="ok">תקין</span> · ${g.n} דירות בקומה${g.p?` · ${fmt(g.p)} kVA`:''}`; });
   S.groups.forEach((g,gi)=>g.types.forEach((t,ti)=>{ const el=document.getElementById(`sub${gi}_${ti}`); if(el){ const d=demand(t.rooms,t.conn); el.innerHTML = d.p? `<span title="שיא ביקוש לדירה לפי חח״י${d.subst?' – צירוף לא קיים בטבלה, נלקח מהשורה הקרובה':''}">(${fmt(d.p)} kVA${d.subst?' ✱':''})</span>` : ''; } }));
+  document.getElementById('bldTitle').textContent = bldName(S,PROJ.active);
   document.getElementById('unitsTotal').textContent = R.units;
   document.getElementById('metersEff').textContent = R.meters + (R.metersAuto?' (אוטומטי)':'');
   document.getElementById('connsTotal').textContent = connStr(R.byConn) || '—';
