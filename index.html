@@ -177,6 +177,13 @@ h3.sub{font-size:15px;margin:18px 0 6px;padding-top:12px;border-top:1px dashed v
 .bxrow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.05fr) minmax(0,.95fr) minmax(0,.5fr) minmax(0,1.3fr) 36px;gap:8px;align-items:end;margin-bottom:6px}
 @media (max-width:560px){.bxrow{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:561px){.bxrow + .bxrow .lbl{display:none}}
+.gowrap{position:relative}
+.gomenu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:6px;min-width:320px;display:flex;flex-direction:column;gap:4px}
+.gomenu[hidden]{display:none}
+.goitem{text-align:right;border:0;background:#fff;border-radius:7px;padding:9px 10px;font:inherit;cursor:pointer;color:var(--ink)}
+.goitem:hover{background:#fdecee;color:var(--red)}
+.goitem small{color:var(--muted)}
+.gonote{font-size:12px;color:var(--muted);padding:6px 10px 4px;border-top:1px solid var(--line);margin-top:2px}
 
 </style>
 
@@ -204,6 +211,10 @@ h3.sub{font-size:15px;margin:18px 0 6px;padding-top:12px;border-top:1px dashed v
     <button class="btn" id="bSave" title="שמירת הנתונים לקובץ במחשב">💾 שמירת טופס</button>
     <button class="btn" id="bLoad" title="טעינת טופס שנשמר קודם, או קובץ Excel שהופק מהטופס">📂 טעינת טופס</button>
     <input type="file" id="fLoad" accept=".json,.xlsx" hidden>
+  </div>
+  <div class="tgrp gowrap">
+    <button class="btn" id="bGo" title="מעבר לאפליקציה אחרת של המשרד – הנתונים שכבר מולאו כאן יועברו אליה אוטומטית">↗ המשך באפליקציה אחרת ▾</button>
+    <div class="gomenu" id="goMenu" hidden></div>
   </div>
   <div class="tgrp">
     <button class="btn" id="bXlsx" title="ייצוא המסמך לקובץ אקסל – זה הקובץ שה-SKILL קורא לפתיחת ההזמנות">ייצוא Excel</button>
@@ -366,12 +377,13 @@ h3.sub{font-size:15px;margin:18px 0 6px;padding-top:12px;border-top:1px dashed v
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V4';
+const VERSION = 'V5';
+const VDATE = '04.11.2026';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
 const FORMAT_ID = 'tiktin-iec-orders';
-document.getElementById('ver').textContent = 'גרסה ' + VERSION;
-document.getElementById('ver2').textContent = 'גרסה ' + VERSION;
+document.getElementById('ver').textContent = 'גרסה ' + VERSION + ' · ' + VDATE;
+document.getElementById('ver2').textContent = 'גרסה ' + VERSION + ' · ' + VDATE;
 
 /* ---------- גודל טופס (ללא השפעה על הדפדפן) ---------- */
 (function(){
@@ -901,6 +913,66 @@ function recalc(){
   document.getElementById('report').innerHTML = secBlocks(sections(O,iss),true).join('');
 }
 function fullRender(){ renderTabs(); renderProject(); loadTop(); renderGroups(); renderExtras(); renderTemp(); renderDecl(); renderDocs(); enhance(document.getElementById('inputs')); recalc(); }
+
+/* ---------- מעבר לאפליקציות אחרות של המשרד, עם הנתונים שמולאו כאן ---------- */
+const APPS_BASE='https://tiktiny.github.io/';
+const catOf = f => { const n=Math.round(num(f,0)); return n>=15?'high':(n>=11?'mid':'low'); };   // לפי מספר הקומות מעל הקרקע
+const H_MR = {low:'lt29', mid:'29to42', high:'42to128'};
+const UP = s => String(s||'').toUpperCase();
+function perFloorOf(b){ const cnt={}; b.groups.forEach(g=>{ const a=Math.round(num(g.from,NaN)), z=Math.round(num(g.to,NaN)); if(!isFinite(a)||!isFinite(z)||z<a) return;
+  const n=g.types.reduce((s,t)=>s+Math.max(0,Math.round(num(t.count))),0); if(n>0) cnt[n]=(cnt[n]||0)+(z-a+1); });
+  let best='',bc=0; Object.entries(cnt).forEach(([n,c])=>{ if(c>bc){ bc=c; best=n; } }); return best; }
+// חיבורים שממוקמים בבניין (לא כלליים לפרויקט) – פרוסים לפי כמות
+function bldConns(i, types){ const out=[]; PROJ.extras.filter(x=>inBld(x,i) && !xOnProj(x) && x.size && (!types||types.includes(x.type))).forEach(x=>{ for(let k=0;k<Math.max(1,Math.round(num(x.qty,1)));k++) out.push(UP(x.size)); }); return out; }
+const parkIn = i => !!PROJ.park.size && bldIndexOf(PROJ.park.loc)===i;
+// חדרים לפי שטח – רק כשלא הוזן מספר חדרים (דרוש לחישוב שיא הביקוש בטופס רוחב הפיר)
+const roomsByArea = a => { a=num(a,0); return !a?'5':(a<=75?'2-3':(a<=100?'4':(a<=130?'5':(a<=160?'6':'7')))); };
+const GO_APPS = [
+  {key:'meter-room', repo:'meter-room', title:'תכנון חדר מונים חברת חשמל', perBld:true},
+  {key:'shaft', repo:'iec-shaft', title:'חישוב רוחב פיר חברת חשמל מונים בקומות'},
+  {key:'guidelines', repo:'residential-guidelines', title:'הכנת הנחיות חשמל לפרויקט'}
+];
+function goState(key){
+  const P=PROJ.project, i=PROJ.active, b=PROJ.list[i], R=compute(b);
+  if(key==='meter-room'){
+    const coms=bldConns(i), base=parkIn(i);
+    return {radios:{mode:'new', height:H_MR[catOf(b.floors)], base:base?'yes':'no', comm:coms.length?'yes':'no'},
+      ids:{units:String(R.units||''), pubSize:UP(b.pub), baseSize:base?UP(PROJ.park.size):'3X400', commCount:String(coms.length||1), pubFromBase:false}, comm:coms,
+      label:`${P.name||''} – ${bldName(b,i)}`};
+  }
+  if(key==='shaft'){
+    let idx=PROJ.list.map((b,j)=>j).filter(j=>compute(PROJ.list[j]).meters==='פיזור מונים');
+    if(!idx.length) idx=PROJ.list.map((b,j)=>j);
+    return {project:P.name||'', active:Math.max(0,idx.indexOf(i)), list:idx.map(j=>{ const bb=PROJ.list[j];
+      return {project:P.name||'', building:bldName(bb,j), floors:compute(bb).N, jordan:'no',
+        groups:bb.groups.map(g=>({from:g.from, to:g.to, types:g.types.map(t=>({count:t.count, rooms:t.rooms||roomsByArea(t.area), area:t.area, conn:t.conn, auto:false}))}))}; })};
+  }
+  if(key==='guidelines'){
+    const pIdx=PROJ.park.size?bldIndexOf(PROJ.park.loc):-1;
+    return {project:{name:P.name||'', iso:String(P.num||'').replace(/\D/g,'').slice(0,7), dev:P.client||'', city:P.city||''},
+      buildings:PROJ.list.map((bb,j)=>{ const RR=compute(bb), cat=catOf(bb.floors), cs=bldConns(j,['com','office','other']), m={};
+        cs.forEach(z=>m[z]=(m[z]||0)+1);
+        return {name:locShort(bldName(bb,j)), cat, units:String(RR.units||''), floors:String(RR.N||''), perFloor:String(perFloorOf(bb)),
+          meters:RR.meters==='פיזור מונים'?'floors':'down', pubSize:(cat==='low'&&['3X40','3X63','3X80','3X100'].includes(UP(bb.pub)))?UP(bb.pub):'',
+          com:cs.length>0, comConns:cs.length?Object.entries(m).map(([sz,n])=>({sz,n:String(n)})):[{sz:'3X25',n:'1'}], ccTouched:cs.length>0}; }),
+      parking:{has:!!PROJ.park.size, baseBld:pIdx, baseSize:PROJ.park.size?UP(PROJ.park.size):'3X400'}};
+  }
+}
+function goTo(key){
+  const app=GO_APPS.find(a=>a.key===key); persist();
+  try{ localStorage.setItem('tiktin_handoff', JSON.stringify({to:key, ts:Date.now(), fromTitle:'מסמך פתיחת הזמנות', returnUrl:location.href.split('?')[0].split('#')[0], state:goState(key)})); }
+  catch(e){ alert('לא ניתן להעביר את הנתונים בדפדפן זה'); return; }
+  location.href = APPS_BASE + app.repo + '/?handoff=1';
+}
+(function(){
+  const btn=document.getElementById('bGo'), menu=document.getElementById('goMenu');
+  const draw=()=>{ const nm=bldName(S,PROJ.active);
+    menu.innerHTML = GO_APPS.map(a=>`<button type="button" class="goitem" data-go="${a.key}" title="מעבר ל${a.title} עם הנתונים שמולאו כאן${a.perBld?' – עבור הבניין בלשונית הפעילה':''}">${a.title}${a.perBld?` <small>– ${esc(nm)}</small>`:''}</button>`).join('')
+      + `<div class="gonote">הנתונים שמולאו כאן יועברו אוטומטית. באפליקציה שנפתחת יופיע כפתור לחזרה לכאן.</div>`;
+    menu.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.go))); };
+  btn.addEventListener('click',e=>{ e.stopPropagation(); if(menu.hidden) draw(); menu.hidden=!menu.hidden; });
+  document.addEventListener('click',e=>{ if(!menu.hidden && !menu.contains(e.target)) menu.hidden=true; });
+})();
 
 document.getElementById('bReset').addEventListener('click',()=>{ if(!confirm('לאפס את כל השדות?')) return; PROJ=defaultProj(); S=PROJ.list[0]; fullRender(); });
 const fname = ext => `פתיחת הזמנות חחי - ${PROJ.project.name||'פרויקט'}.${ext}`;
