@@ -177,6 +177,22 @@ h3.sub{font-size:15px;margin:18px 0 6px;padding-top:12px;border-top:1px dashed v
 .bxrow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.05fr) minmax(0,.95fr) minmax(0,.5fr) minmax(0,1.3fr) 36px;gap:8px;align-items:end;margin-bottom:6px}
 @media (max-width:560px){.bxrow{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:561px){.bxrow + .bxrow .lbl{display:none}}
+.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media (max-width:900px){.g5{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:560px){.g5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.catseg{display:flex;height:var(--h);border:1px solid #b9c0c8;border-radius:7px;overflow:hidden;background:#fff}
+.catseg button{flex:1;min-width:0;border:0;border-inline-start:1px solid var(--line);background:#fff;font:inherit;cursor:pointer;color:var(--ink);padding:0 4px;white-space:nowrap;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15}
+.catseg button b{font-size:13px;font-weight:600}
+.catseg button small{font-size:11px;color:var(--muted)}
+.catseg button.on small{color:#fff}
+.catseg button:first-child{border-inline-start:0}
+.catseg button:hover{background:#fdecee}
+.catseg button.on{background:var(--red);color:#fff}
+div.f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted);min-width:0}
+div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 4px;line-height:1.3}
+@media (max-width:560px){#bldTypeCell{grid-column:1/-1}}
+#bldTypeSt{font-weight:400;color:var(--muted);font-size:12px}
+#bldTypeSt.warn{color:var(--red)}
 .gowrap{position:relative}
 .gomenu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:6px;min-width:320px;display:flex;flex-direction:column;gap:4px}
 .gomenu[hidden]{display:none}
@@ -271,18 +287,21 @@ h3.sub{font-size:15px;margin:18px 0 6px;padding-top:12px;border-top:1px dashed v
     <details class="help"><summary>הסבר</summary><div>
       לכל בניין נפתחת הזמנה קבועה נפרדת באתר. מוסיפים בניין בלשונית "＋ בניין", או קולטים את כל הבניינים מקובץ תמהיל (📥 קליטה מקובץ).<br>
       <b>מיקום מונים</b> – נבחר אוטומטית לפי כלל המשרד: עד 100 דירות – ריכוז מונים (חדר מונים), מעל 100 – פיזור מונים בקומות. אפשר לשנות; הבחירה עוברת במפורש להזמנה באתר.<br>
+      <b>קטגוריית הבניין</b> – 3 קטגוריות לפי גובה רצפת קומת המגורים האחרונה: עד 29 מ׳ – בניין נמוך, 29 עד 42 מ׳ – רב קומות, מעל 42 מ׳ – מגדל. נבחר אוטומטית לפי הגובה (אם הגובה לא הוזן – לפי מספר הקומות, כ-2.9 מ׳ לקומה); אפשר ללחוץ ולבחור אחרת.<br>
       <b>חיבור ציבורי</b> – החיבור לשטחים המשותפים של הבניין, נכלל בהזמנה של אותו בניין.<br>
       סה״כ הדירות ופירוט החיבורים מחושבים אוטומטית ממקבצי הקומות.
     </div></details>
-    <div class="grid g4" id="bldGrid">
+    <div class="grid g5" id="bldGrid">
       <label class="f"><span class="lbl">שם בניין / כניסה</span><span class="fld"><input id="building" type="text" title="כך יופיע הבניין בכתובת החיבור, למשל בניין A"></span></label>
       <label class="f"><span class="lbl">מספר קומות מעל קומת קרקע</span><span class="fld"><input id="floors" type="text" inputmode="numeric" title="הקומה העליונה. קומת קרקע = 0"></span></label>
+      <label class="f"><span class="lbl">גובה רצפת קומת המגורים האחרונה [מ׳]</span><span class="fld"><input id="height" type="text" inputmode="decimal" title="הגובה הקובע: מרצפת קומת הכניסה (קרקע) עד רצפת קומת המגורים האחרונה. אם ריק – מוערך לפי מספר הקומות (כ-2.9 מ׳ לקומה)"></span></label>
       <label class="f"><span class="lbl">מיקום מונים</span><span class="fld"><select id="meters" data-def="" title="ריכוז מונים בחדר מונים או פיזור מונים בקומות – נבחר במפורש בהזמנה באתר"><option value="">— אוטומטי לפי כמות דירות —</option><option value="ריכוז מונים">ריכוז מונים</option><option value="פיזור מונים">פיזור מונים</option></select></span></label>
       <label class="f"><span class="lbl">חיבור ציבורי לבניין</span><span class="fld"><select id="pub" data-def="" title="גודל החיבור הציבורי של הבניין"></select></span></label>
     </div>
-    <div class="grid g4" style="margin-top:10px">
+    <div class="grid g5" style="margin-top:10px">
       <label class="f"><span class="lbl">סה״כ דירות בבניין – מחושב</span><span class="ro hl" id="unitsTotal" title="מחושב אוטומטית ממקבצי הקומות">0</span></label>
       <label class="f"><span class="lbl">מיקום מונים שייכנס להזמנה</span><span class="ro" id="metersEff" title="הבחירה שתיכנס להזמנה באתר">—</span></label>
+      <div class="f" id="bldTypeCell"><span class="lbl">קטגוריית הבניין <span id="bldTypeSt"></span></span><div class="catseg" id="bldType" role="group" aria-label="קטגוריית הבניין"></div></div>
       <label class="f"><span class="lbl">חיבורי דירות לפי גודל – מחושב</span><span class="ro" id="connsTotal" title="כמות דירות לכל גודל חיבור">—</span></label>
       <label class="f"><span class="lbl">כתובת החיבור להזמנה</span><span class="ro" id="addrBld" title="מהות + בניין + פרויקט + עיר + קוד ראש צוות">—</span></label>
     </div>
@@ -377,7 +396,7 @@ h3.sub{font-size:15px;margin:18px 0 6px;padding-top:12px;border-top:1px dashed v
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V5';
+const VERSION = 'V6';
 const VDATE = '04.11.2026';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
@@ -460,7 +479,7 @@ const PROJ_FIELDS = [
 
 /* ---------- state ---------- */
 function defaultBuilding(i){
-  return {building:'בניין '+String.fromCharCode(65+(i||0)), floors:'', meters:'', pub:'',
+  return {building:'בניין '+String.fromCharCode(65+(i||0)), floors:'', height:'', cat:'', meters:'', pub:'',
     groups:[{from:'',to:'',types:[{count:'',rooms:'',area:'',conn:'',auto:true}]}]};
 }
 function defaultProj(){
@@ -547,7 +566,7 @@ function renderProject(){
 }
 
 /* ---------- 2. building top ---------- */
-const TOP=['building','floors','meters','pub'];
+const TOP=['building','floors','height','meters','pub'];
 function loadTop(){ document.getElementById('pub').innerHTML=sizeOpts(S.pub); TOP.forEach(k=>{ document.getElementById(k).value = S[k]??''; }); }
 TOP.forEach(k=>{ const el=document.getElementById(k);
   bind(el,()=>{ S[k]=el.value; if(k==='building') renderTabs(); recalc(); }); });
@@ -901,6 +920,7 @@ function recalc(){
   document.getElementById('bldTitle').textContent = bldName(S,PROJ.active);
   document.getElementById('unitsTotal').textContent = R.units;
   document.getElementById('metersEff').textContent = R.meters + (R.metersAuto?' (אוטומטי)':'');
+  drawCat();
   document.getElementById('connsTotal').textContent = connStr(R.byConn) || '—';
   document.getElementById('totals').innerHTML = `סה״כ ${R.units} דירות · ${connStr(R.byConn)||'אין חיבורים'}${R.kva?` · Σ שיא ביקוש ${fmt(R.kva)} kVA`:''}`;
   const O=buildOrders(), iss=issues(O); LAST={O,iss};
@@ -916,7 +936,25 @@ function fullRender(){ renderTabs(); renderProject(); loadTop(); renderGroups();
 
 /* ---------- מעבר לאפליקציות אחרות של המשרד, עם הנתונים שמולאו כאן ---------- */
 const APPS_BASE='https://tiktiny.github.io/';
-const catOf = f => { const n=Math.round(num(f,0)); return n>=15?'high':(n>=11?'mid':'low'); };   // לפי מספר הקומות מעל הקרקע
+// קטגוריית הבניין לפי הגובה: עד 29 מ' נמוך, עד 42 מ' רב קומות, מעל 42 מ' מגדל. ללא גובה – הערכה לפי 2.9 מ' לקומה
+const heightOf = b => { const h=num(b&&b.height,0); return h>0 ? {h, est:false} : {h:Math.round(num(b&&b.floors,0))*29/10, est:true}; };
+const catOf = b => { const h=heightOf(b).h; return h>42?'high':(h>29?'mid':'low'); };
+const CAT_LBL = {low:'בניין נמוך', mid:'רב קומות', high:'מגדל'};
+const CAT_BTN = {low:'נמוך', mid:'רב קומות', high:'מגדל'};
+const CAT_RNG = {low:'עד 29 מ׳', mid:'29 עד 42 מ׳', high:'מעל 42 מ׳'};
+const catEff = b => (b&&CAT_LBL[b.cat]) ? b.cat : catOf(b);   // בחירה ידנית, אחרת לפי הגובה
+function drawCat(){
+  const box=document.getElementById('bldType'), st=document.getElementById('bldTypeSt'); if(!box) return;
+  const hh=heightOf(S), known=num(S.floors,0)>0||!hh.est, auto=catOf(S), cur=CAT_LBL[S.cat]?S.cat:(known?auto:'');
+  if(!box.children.length){   // נבנה פעם אחת – כך לחיצה לא הולכת לאיבוד כשהמסך מתעדכן
+    box.innerHTML=['low','mid','high'].map(c=>`<button type="button" data-cat="${c}" title="${CAT_LBL[c]} – ${CAT_RNG[c]} (גובה רצפת קומת המגורים האחרונה)"><b>${CAT_BTN[c]}</b><small>${CAT_RNG[c]}</small></button>`).join('');
+    box.querySelectorAll('[data-cat]').forEach(bt=>bt.addEventListener('click',()=>{ const c=bt.dataset.cat, h2=heightOf(S), kn=num(S.floors,0)>0||!h2.est; S.cat = (kn&&c===catOf(S)) ? '' : c; recalc(); })); }
+  box.querySelectorAll('[data-cat]').forEach(bt=>{ const on=bt.dataset.cat===cur; bt.classList.toggle('on',on); bt.setAttribute('aria-pressed',on); });
+  const hs=`${hh.est?'≈':''}${fmt(Math.round(hh.h*10)/10)} מ׳`;
+  if(!known){ st.textContent=''; st.className=''; }
+  else if(CAT_LBL[S.cat] && S.cat!==auto){ st.textContent=`(ידני · לפי ${hs} צפוי ${CAT_LBL[auto]})`; st.className='warn'; }
+  else { st.textContent=`(אוטומטי · ${hs}${hh.est?' לפי הקומות':''})`; st.className=''; }
+}
 const H_MR = {low:'lt29', mid:'29to42', high:'42to128'};
 const UP = s => String(s||'').toUpperCase();
 function perFloorOf(b){ const cnt={}; b.groups.forEach(g=>{ const a=Math.round(num(g.from,NaN)), z=Math.round(num(g.to,NaN)); if(!isFinite(a)||!isFinite(z)||z<a) return;
@@ -936,7 +974,7 @@ function goState(key){
   const P=PROJ.project, i=PROJ.active, b=PROJ.list[i], R=compute(b);
   if(key==='meter-room'){
     const coms=bldConns(i), base=parkIn(i);
-    return {radios:{mode:'new', height:H_MR[catOf(b.floors)], base:base?'yes':'no', comm:coms.length?'yes':'no'},
+    return {radios:{mode:'new', height:H_MR[catEff(b)], base:base?'yes':'no', comm:coms.length?'yes':'no'},
       ids:{units:String(R.units||''), pubSize:UP(b.pub), baseSize:base?UP(PROJ.park.size):'3X400', commCount:String(coms.length||1), pubFromBase:false}, comm:coms,
       label:`${P.name||''} – ${bldName(b,i)}`};
   }
@@ -950,7 +988,7 @@ function goState(key){
   if(key==='guidelines'){
     const pIdx=PROJ.park.size?bldIndexOf(PROJ.park.loc):-1;
     return {project:{name:P.name||'', iso:String(P.num||'').replace(/\D/g,'').slice(0,7), dev:P.client||'', city:P.city||''},
-      buildings:PROJ.list.map((bb,j)=>{ const RR=compute(bb), cat=catOf(bb.floors), cs=bldConns(j,['com','office','other']), m={};
+      buildings:PROJ.list.map((bb,j)=>{ const RR=compute(bb), cat=catEff(bb), cs=bldConns(j,['com','office','other']), m={};
         cs.forEach(z=>m[z]=(m[z]||0)+1);
         return {name:locShort(bldName(bb,j)), cat, units:String(RR.units||''), floors:String(RR.N||''), perFloor:String(perFloorOf(bb)),
           meters:RR.meters==='פיזור מונים'?'floors':'down', pubSize:(cat==='low'&&['3X40','3X63','3X80','3X100'].includes(UP(bb.pub)))?UP(bb.pub):'',
