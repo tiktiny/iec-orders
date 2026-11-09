@@ -201,6 +201,13 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
 .goitem small{color:var(--muted)}
 .gonote{font-size:12px;color:var(--muted);padding:6px 10px 4px;border-top:1px solid var(--line);margin-top:2px}
 
+.btn.iecgo{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:600}
+.btn.iecgo:disabled{background:#f3d3bb;border-color:#f3d3bb;color:#fff;cursor:not-allowed}
+.btn.pick.has{background:#eef8f1;border-color:#9fd3b0}
+.iecbar{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.status .iecst{display:block;margin-top:6px;font-weight:400}
+#extDlg .dbox{max-width:560px}
+#extDlg ol{padding-inline-start:20px;line-height:1.7;margin:6px 0}
 </style>
 
 </head>
@@ -231,6 +238,9 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
   <div class="tgrp gowrap">
     <button class="btn" id="bGo" title="מעבר לאפליקציה אחרת של המשרד – הנתונים שכבר מולאו כאן יועברו אליה אוטומטית">↗ המשך באפליקציה אחרת ▾</button>
     <div class="gomenu" id="goMenu" hidden></div>
+  </div>
+  <div class="tgrp">
+    <button class="btn iecgo" id="bIec" disabled title="פותח את אתר חברת החשמל וממלא את ההזמנות אוטומטית – פעיל רק כשכל הבדיקות תקינות">⚡ פתיחת ההזמנות בחברת החשמל</button>
   </div>
   <div class="tgrp">
     <button class="btn" id="bXlsx" title="ייצוא המסמך לקובץ אקסל – זה הקובץ שה-SKILL קורא לפתיחת ההזמנות">ייצוא Excel</button>
@@ -377,7 +387,7 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
   <div class="card">
     <h2><span class="num">7</span>מסמכים לצירוף להזמנות</h2>
     <details class="help"><summary>הסבר</summary><div>
-      בוחרים את הקובץ במחשב (📎) – שם הקובץ נרשם והמסמך מסומן כהתקבל. הקבצים עצמם נשמרים בתיקיית הפרויקט ומועברים ל-SKILL יחד עם קובץ האקסל (בנפרד או ב-ZIP).<br>
+      בוחרים את הקובץ במחשב (📎) – שם הקובץ נרשם, המסמך מסומן כהתקבל והקובץ עצמו נשמר בדפדפן (📎 ירוק), כדי שכפתור ⚡ יצרף אותו באתר חברת החשמל. שם קובץ שהוקלד ידנית בלי 📎 – לא יצורף אוטומטית.<br>
       <b>חובה:</b> תצהיר בעל חטיבת קרקע, תכנית הגשה (גרמושקה), ייפוי כוח ליועץ. <b>נדרש באתר</b> – אפשר להשלים אחרי שליחת ההזמנה. תכנית מדידה – חובה כשיש חיבור זמני.
     </div></details>
     <div id="docs" style="margin-top:10px"></div>
@@ -396,8 +406,8 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V6';
-const VDATE = '04.11.2026';
+const VERSION = 'V7';
+const VDATE = '09.11.2026';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
 const FORMAT_ID = 'tiktin-iec-orders';
@@ -803,11 +813,14 @@ function renderDocs(){
       <label class="f"><span class="lbl">סוג המסמך</span><span class="ro">${d.l}</span></label>
       <label class="f"><span class="lbl">נדרש</span><span class="ro ${/^חובה$/.test(d.req)?'hl':''}">${d.req}</span></label>
       <label class="f wide"><span class="lbl">שם הקובץ</span>${fld(`<input data-df="file" value="${esc(v.file)}" title="שם הקובץ כפי שיצורף באתר">`)}</label>
-      <button class="btn pick" data-act="pick" title="בחירת הקובץ מהמחשב – ממלא את שם הקובץ">📎</button>
+      <button class="btn pick ${DOCSTORE[d.k]&&DOCSTORE[d.k]===v.file?'has':''}" data-act="pick" title="${DOCSTORE[d.k]&&DOCSTORE[d.k]===v.file?'הקובץ שמור ויצורף אוטומטית – לחיצה להחלפה':'בחירת הקובץ מהמחשב – ממלא את שם הקובץ ושומר אותו לצירוף אוטומטי'}">📎</button>
       <label class="f"><span class="lbl">התקבל</span>${fld(`<select data-df="got" data-def="לא" title="האם הקובץ התקבל ונבדק"><option ${v.got!=='כן'?'selected':''}>לא</option><option ${v.got==='כן'?'selected':''}>כן</option></select>`)}</label>
     </div>`; }).join('') + `<input type="file" id="fDoc" hidden>`;
   let cur=null; const fi=box.querySelector('#fDoc');
-  fi.addEventListener('change',e=>{ const f=e.target.files[0]; e.target.value=''; if(!f||!cur) return; PROJ.docs[cur].file=f.name; PROJ.docs[cur].got='כן'; renderDocs(); recalc(); });
+  fi.addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f||!cur) return; const k=cur;
+    PROJ.docs[k].file=f.name; PROJ.docs[k].got='כן';
+    try{ await idbPut(k,{name:f.name,type:f.type||'application/octet-stream',size:f.size,data:await f.arrayBuffer()}); DOCSTORE[k]=f.name; }catch(err){ alert('לא ניתן היה לשמור את הקובץ בדפדפן: '+err.message); }
+    renderDocs(); recalc(); });
   box.querySelectorAll('.drow').forEach(r=>{ const v=PROJ.docs[r.dataset.k];
     r.querySelectorAll('[data-df]').forEach(el=>bind(el,()=>{ v[el.dataset.df]=el.value; if(el.dataset.df==='file' && el.value && v.got!=='כן'){ v.got='כן'; r.querySelector('[data-df=got]').value='כן'; } recalc(); }));
     r.querySelector('[data-act=pick]').addEventListener('click',()=>{ cur=r.dataset.k; fi.click(); });
@@ -829,11 +842,15 @@ function buildOrders(){
     inc.forEach(x=>parts.push(`${xDesc(x)}: ${Math.max(1,Math.round(num(x.qty,1)))} × ${x.size.toUpperCase()}`));
     const total=R.units+(b.pub?1:0)+inc.reduce((s,x)=>s+Math.max(1,Math.round(num(x.qty,1))),0);
     let note=`פרויקט ${P.name||''}; ${nm}; ${R.units} דירות; ${R.meters}`+(b.pub?`; ציבורי ${SZ(b.pub)}`:'')+inc.map(x=>`; ${xDesc(x)} ${SZ(x.size)} (שיוך: ${xShiyuch(x)})`).join('');
-    out.push({kind:'קבועה – מגורים', target:nm, addr:'הזמנה ל'+nm+tail, meters:R.meters, conns:parts.join('; '), total, note, bld:i});
+    const items=CONNS.filter(c=>R.byConn[c]).map(c=>({what:'דירות', size:c.toUpperCase(), qty:R.byConn[c]}));
+    Object.keys(R.byConn).filter(c=>!CONNS.includes(c)).forEach(c=>items.push({what:'דירות', size:c.toUpperCase(), qty:R.byConn[c]}));
+    if(b.pub) items.push({what:'ציבורי', size:b.pub.toUpperCase(), qty:1});
+    inc.forEach(x=>items.push({what:xDesc(x), size:x.size.toUpperCase(), qty:Math.max(1,Math.round(num(x.qty,1)))}));
+    out.push({kind:'קבועה – מגורים', type:'res', target:nm, addr:'הזמנה ל'+nm+tail, meters:R.meters, conns:parts.join('; '), total, note, bld:i, units:R.units, items});
   });
   [...PROJ.extras.filter(x=>!xInb(x)), ...parkItems().filter(x=>!xInb(x)&&x.size)].forEach(x=>{
     const q=Math.max(1,Math.round(num(x.qty,1))), d=xDesc(x);
-    out.push({kind:'קבועה – חיבור נפרד', target:d, addr:'הזמנה ל'+d+tail, meters:'—', conns:x.size?`${q} × ${x.size.toUpperCase()}`:'', total:q,
+    out.push({kind:'קבועה – חיבור נפרד', type:'sep', target:d, addr:'הזמנה ל'+d+tail, meters:'—', conns:x.size?`${q} × ${x.size.toUpperCase()}`:'', total:q, items:x.size?[{what:typeLbl(x), size:x.size.toUpperCase(), qty:q}]:[], xtLbl:typeLbl(x),
       note:`פרויקט ${P.name||''}; ${typeLbl(x)}; מיקום: ${xLocTxt(x)}; שיוך: ${xShiyuch(x)}`+(x.note?'; '+x.note:''), xt:x.type});
   });
   const nPerm=out.length;
@@ -841,9 +858,9 @@ function buildOrders(){
   if(PROJ.temp.size){
     const li=Math.min(+PROJ.temp.link||0,PROJ.list.length-1), ln=bldName(PROJ.list[li],li);
     const link=`הזמנה קבועה של ${ln} (מס׳ ${li+1} ברשימה)`;
-    out.push({kind:'חיבור זמני', target:'כל המגרש', addr:'חיבור זמני למגרש'+tail, meters:'—', conns:`1 × ${PROJ.temp.size.toUpperCase()}`, total:1, note:`חיבור זמני לאתר בנייה; לקשר ל${link}; לצרף תכנית מדידה`, link:li});
-    out.push({kind:'עע״א', target:'כל המגרש', addr:'עע״א לחיבור זמני למגרש'+tail, meters:'—', conns:'עבודה בתשתית – לפי האתר', total:0, note:`עע״א לחיבור הזמני; לקשר ל${link}`, link:li});
-    out.push({kind:'פירוק חיבור זמני', target:'כל המגרש', addr:'פירוק חיבור זמני למגרש'+tail, meters:'—', conns:`פירוק 1 × ${PROJ.temp.size.toUpperCase()}`, total:0, note:`פירוק החיבור הזמני; לקשר ל${link}`, link:li});
+    out.push({kind:'חיבור זמני', type:'temp', size:PROJ.temp.size.toUpperCase(), target:'כל המגרש', addr:'חיבור זמני למגרש'+tail, meters:'—', conns:`1 × ${PROJ.temp.size.toUpperCase()}`, total:1, note:`חיבור זמני לאתר בנייה; לקשר ל${link}; לצרף תכנית מדידה`, link:li});
+    out.push({kind:'עע״א', type:'infra', target:'כל המגרש', addr:'עע״א לחיבור זמני למגרש'+tail, meters:'—', conns:'עבודה בתשתית – לפי האתר', total:0, note:`עע״א לחיבור הזמני; לקשר ל${link}`, link:li});
+    out.push({kind:'פירוק חיבור זמני', type:'remove', size:PROJ.temp.size.toUpperCase(), target:'כל המגרש', addr:'פירוק חיבור זמני למגרש'+tail, meters:'—', conns:`פירוק 1 × ${PROJ.temp.size.toUpperCase()}`, total:0, note:`פירוק החיבור הזמני; לקשר ל${link}`, link:li});
   }
   out.forEach((o,i)=>{ o.seq=i+1; o.len=o.addr.length; o.perm=i<nPerm; });
   return {orders:out, calcs};
@@ -898,8 +915,10 @@ function sections(O, iss){
   const repX=[...parkItems().filter(x=>x.size), ...PROJ.extras];
   if(repX.length) secs.push({title:'חניון, מסחר, משרדים ומבני ציבור', head:['סוג','מיקום','שיוך החיבור','תיאור','גודל','כמות','אופן פתיחה','הערות'],
     rows:repX.map(x=>[typeLbl(x), xLocTxt(x), xShiyuch(x), xDesc(x), x.size?x.size.toUpperCase():'–', Math.max(1,Math.round(num(x.qty,1))), xInb(x)?'בהזמנת הבניין':'הזמנה נפרדת', x.note||'–']), wide:3});
-  secs.push({title:'רשימת ההזמנות לפתיחה – לפי הסדר', head:['#','סוג ההזמנה','מיועדת ל־','כתובת החיבור (תיאור)','תווים','מיקום מונים','פירוט חיבורים','הערות להזמנה'],
-    rows:ord.map(o=>[o.seq,o.kind,o.target,o.addr,o.len>100?o.len+' ⚠':o.len,o.meters,o.conns||'–',o.note]), wide:3, small:true,
+  const RES=(PROJ.iec&&PROJ.iec.orders)||[]; const resOf=o=>RES.find(r=>r.seq===o.seq&&r.target===o.target);
+  const hasRes=RES.some(r=>r.number||r.status!=='ממתין');
+  secs.push({title:'רשימת ההזמנות לפתיחה – לפי הסדר', head:['#','סוג ההזמנה','מיועדת ל־','כתובת החיבור (תיאור)','תווים','מיקום מונים','פירוט חיבורים','הערות להזמנה',...(hasRes?['מספר הזמנה']:[])],
+    rows:ord.map(o=>{ const r=resOf(o); return [o.seq,o.kind,o.target,o.addr,o.len>100?o.len+' ⚠':o.len,o.meters,o.conns||'–',o.note,...(hasRes?[r?(r.number||r.status):'–']:[])]; }), wide:3, small:true,
     note:'סדר הפתיחה: קודם כל ההזמנות הקבועות (בניין אחרי בניין, ואחריהם החיבורים הנפרדים) – ורק אחר כך שלוש ההזמנות של החיבור הזמני.\nמההזמנה השנייה ואילך – בהערות ההזמנה רושמים את מספרי כל ההזמנות הקודמות בפרויקט.\nכתובת החיבור: בוחרים יישוב, משאירים רחוב ומספר ריקים וכותבים את התיאור כפי שמופיע כאן. אם האתר דוחה את האורך – עוצרים והמתכנן מחליט מה להשמיט.'});
   secs.push({title:'חיבור זמני לאתר בנייה', kv: PROJ.temp.size ? [['גודל חיבור זמני',SZ(PROJ.temp.size)],['הזמנה קבועה מקושרת',bldName(PROJ.list[+PROJ.temp.link||0]||{},+PROJ.temp.link||0)],['הזמנות שייפתחו','חיבור זמני · עע״א · פירוק חיבור זמני'],['תכנית מדידה',PROJ.docs.survey.got==='כן'?'התקבלה – '+(PROJ.docs.survey.file||''):'חסרה']] : [['חיבור זמני','אין']]});
   secs.push({title:'הצהרות ואופן השליחה', kv:[
@@ -929,7 +948,8 @@ function recalc(){
   const ts=document.getElementById('tSurvey'); if(ts) ts.textContent = !PROJ.temp.size?'—':(PROJ.docs.survey.got==='כן'?'התקבלה':'חסרה – חובה');
   document.getElementById('status').innerHTML = iss.length
     ? `<div class="status badb"><b>${iss.length} פריטים לטיפול לפני פתיחת ההזמנות</b> – פירוט בסוף המסמך.</div>`
-    : `<div class="status okb"><b>✔ המסמך מוכן</b> – ${O.orders.length} הזמנות לפתיחה. לייצוא: Excel (לשימוש ה-SKILL), Word או PDF.</div>`;
+    : `<div class="status okb"><b>✔ המסמך מוכן</b> – ${O.orders.length} הזמנות לפתיחה. לחיצה על ⚡ פתיחת ההזמנות בחברת החשמל תפתח אותן באתר.${iecStateLine()}</div>`;
+  updIecBtn(iss);
   document.getElementById('report').innerHTML = secBlocks(sections(O,iss),true).join('');
 }
 function fullRender(){ renderTabs(); renderProject(); loadTop(); renderGroups(); renderExtras(); renderTemp(); renderDecl(); renderDocs(); enhance(document.getElementById('inputs')); recalc(); }
@@ -1012,7 +1032,7 @@ function goTo(key){
   document.addEventListener('click',e=>{ if(!menu.hidden && !menu.contains(e.target)) menu.hidden=true; });
 })();
 
-document.getElementById('bReset').addEventListener('click',()=>{ if(!confirm('לאפס את כל השדות?')) return; PROJ=defaultProj(); S=PROJ.list[0]; fullRender(); });
+document.getElementById('bReset').addEventListener('click',()=>{ if(!confirm('לאפס את כל השדות?')) return; PROJ=defaultProj(); S=PROJ.list[0]; idbClear(); DOCSTORE={}; fullRender(); });
 const fname = ext => `פתיחת הזמנות חחי - ${PROJ.project.name||'פרויקט'}.${ext}`;
 function download(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); }
 document.getElementById('bSave').addEventListener('click',()=>download(new Blob([JSON.stringify(PROJ,null,1)],{type:'application/json'}), fname('json')));
@@ -1466,7 +1486,74 @@ document.getElementById('fImport').addEventListener('change',async e=>{
   } finally { btn.disabled=false; btn.innerHTML=old; }
 });
 
-fullRender();
+
+/* ---------- ⚡ פתיחת ההזמנות באתר חברת החשמל (דרך תוסף הכרום של טיקטין) ---------- */
+const IEC_ORDERS_URL = 'https://digitalorders.iec.co.il/electrical-consultant';
+let EXT=null; // גרסת התוסף אם מותקן
+let DOCSTORE={}; // k -> שם הקובץ השמור בדפדפן
+function idb(){ return new Promise((res,rej)=>{ const r=indexedDB.open('tiktin_iec_docs',1); r.onupgradeneeded=()=>r.result.createObjectStore('f'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function idbPut(k,v){ const d=await idb(); return new Promise((res,rej)=>{ const t=d.transaction('f','readwrite'); t.objectStore('f').put(v,k); t.oncomplete=res; t.onerror=()=>rej(t.error); }); }
+async function idbGet(k){ const d=await idb(); return new Promise((res,rej)=>{ const q=d.transaction('f').objectStore('f').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }); }
+async function idbClear(){ try{ const d=await idb(); d.transaction('f','readwrite').objectStore('f').clear(); }catch(e){} }
+async function loadDocStore(){ try{ for(const d of DOCS){ const v=await idbGet(d.k); if(v) DOCSTORE[d.k]=v.name; } }catch(e){} }
+function abToDataUrl(buf,type){ return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(new Blob([buf],{type})); }); }
+
+function iecIssues(){ // בדיקות נוספות שנדרשות רק לפתיחה אוטומטית
+  const out=[];
+  ['decl','plan','poa'].forEach(k=>{ if(PROJ.docs[k].got==='כן' && DOCSTORE[k]!==PROJ.docs[k].file) out.push('יש לצרף את הקובץ עצמו (📎): '+DOCS.find(d=>d.k===k).l); });
+  if(PROJ.temp.size && PROJ.docs.survey.got==='כן' && DOCSTORE.survey!==PROJ.docs.survey.file) out.push('יש לצרף את הקובץ עצמו (📎): תכנית מדידה של האתר');
+  return out;
+}
+function updIecBtn(iss){
+  const b=document.getElementById('bIec'); if(!b) return;
+  const more=iecIssues(), all=[...iss,...more], run=PROJ.iec&&['running','waiting_login','need_user'].includes(PROJ.iec.status);
+  b.disabled = all.length>0 || run;
+  b.title = run ? 'פתיחת ההזמנות כבר רצה באתר חברת החשמל'
+    : all.length ? 'הכפתור יופעל כשכל הבדיקות תקינות. חסר: '+all.slice(0,6).join(' · ')+(all.length>6?' …':'')
+    : 'פותח את אתר חברת החשמל, ממתין להתחברות שלך ופותח את '+LAST.O.orders.length+' ההזמנות לפי הסדר';
+}
+function iecStateLine(){
+  const st=PROJ.iec; if(!st) return '';
+  const done=(st.orders||[]).filter(o=>o.number).length, n=(st.orders||[]).length;
+  const T={waiting_login:'ממתין להתחברות באתר חברת החשמל',running:'פותח הזמנות באתר',need_user:'ממתין להחלטה שלך בחלונית באתר',done:'הסתיים',stopped:'נעצר',error:'נעצר בגלל תקלה',paused:'מושהה'};
+  return `<span class="iecst">⚡ ${T[st.status]||st.status} · נפתחו ${done} מתוך ${n} הזמנות</span>`;
+}
+const toExt = m => window.postMessage({src:'tiktin-iec-page',...m}, location.origin);
+window.addEventListener('message',e=>{
+  if(e.source!==window || !e.data || e.data.src!=='tiktin-iec-ext') return;
+  const d=e.data;
+  if(d.type==='PONG'){ if(!EXT){ EXT=d.ver; toExt({type:'STATUS'}); } return; }
+  if(d.type==='START_RESULT'){ if(!d.ok) alert('לא ניתן להתחיל: '+(d.error||'')); return; }
+  if((d.type==='PROGRESS'||d.type==='STATE') && d.state && (!PROJ.iec || d.state.startedAt===PROJ.iec.startedAt || d.type==='PROGRESS')){
+    if(PROJ.iec && d.state.startedAt!==PROJ.iec.startedAt && d.type==='STATE') return;
+    PROJ.iec={status:d.state.status, startedAt:d.state.startedAt, orders:d.state.orders}; recalc();
+  }
+});
+toExt({type:'PING'});
+
+async function startIec(){
+  if(!EXT){ // בלי התוסף: פותחים את מערכת ההזמנות של חברת החשמל, והמסמך נשאר פתוח כאן לפי הסדר
+    window.open(IEC_ORDERS_URL,'_blank'); document.getElementById('extHp').textContent=(PROJ.project.client||'')+' – '+(PROJ.project.hp||''); document.getElementById('extDlg').style.display='flex'; return; }
+  const O=LAST.O, P=PROJ.project;
+  if(!confirm(`לפתוח ${O.orders.length} הזמנות באתר חברת החשמל עבור "${P.name}"?\n\nייפתח אתר חברת החשמל – מתחברים בו כרגיל (ת״ז + SMS) והתוסף ממשיך לבד.`+(PROJ.send.mode==='wait'?`\nלפני כל שליחה: המתנה ${num(PROJ.send.wait)} דקות לבדיקה.`:'\nההזמנות יאושרו וישלחו אוטומטית.'))) return;
+  const docs=[];
+  for(const d of DOCS){ const v=PROJ.docs[d.k]; if(v.got!=='כן' || DOCSTORE[d.k]!==v.file) continue;
+    const f=await idbGet(d.k); if(f) docs.push({k:d.k, label:d.l, name:f.name, type:f.type, size:f.size, dataUrl:await abToDataUrl(f.data,f.type)}); }
+  const job={ v:VERSION, createdAt:Date.now(),
+    project:{...P, leaderCode:leaderCode(), account:'טיקטין תכנון חשמל (2003) בע״מ'},
+    orders:O.orders.map(o=>({seq:o.seq,type:o.type,kind:o.kind,target:o.target,addr:o.addr,meters:o.meters,items:o.items||[],size:o.size||'',note:o.note,perm:o.perm,link:o.link,units:o.units||0})),
+    decl:{...PROJ.decl}, send:{...PROJ.send}, temp:{...PROJ.temp}, docs };
+  PROJ.iec={status:'waiting_login', startedAt:0, orders:job.orders.map(o=>({seq:o.seq,target:o.target,kind:o.kind,status:'ממתין',number:''}))}; recalc();
+  toExt({type:'START', job});
+}
+document.getElementById('bIec').addEventListener('click', startIec);
+document.body.insertAdjacentHTML('beforeend', `<div id="extDlg" class="dlg"><div class="dbox"><h2>⚡ נפתחה מערכת ההזמנות של חברת החשמל</h2><div class="dbody">
+  מערכת ההזמנות נפתחה בלשונית חדשה. מתחברים כרגיל (ת״ז + SMS) ופותחים את ההזמנות לפי רשימת ההזמנות בסעיף 8 – בניין אחרי בניין, ואחריהם החיבורים הנפרדים והחיבור הזמני.
+  <ol><li>בחירת לקוח לפי ח.פ.: <b id="extHp"></b></li><li>כתובת החיבור: בוחרים יישוב ומעתיקים את "כתובת החיבור (תיאור)" מהרשימה.</li><li>מההזמנה השנייה – רושמים בהערות את מספרי ההזמנות הקודמות.</li></ol>
+  <b>בקרוב:</b> תוסף טיקטין לכרום ימלא את ההזמנות אוטומטית, והכפתור יעשה את כל זה לבד.</div>
+  <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" onclick="this.closest('.dlg').style.display='none'">הבנתי</button></div></div></div>`);
+
+loadDocStore().then(()=>fullRender());
 </script>
 </body>
 </html>
