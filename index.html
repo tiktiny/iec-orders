@@ -437,7 +437,7 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V9';
+const VERSION = 'V10';
 const VDATE = '09.11.2026';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
@@ -517,11 +517,10 @@ const PROJ_FIELDS = [
   ['phone','טלפון','num','טלפון איש הקשר'],
   ['email','דוא״ל','text','דוא״ל איש הקשר'],
   ['leader','ראש צוות מטפל','leader','הקוד נוסף בסוגריים מרובעים בסוף כתובת החיבור'],
-  ['sms','טלפון לקבלת SMS (קבוע)','num','מספר קבוע של המשרד לקבלת הודעות SMS מחברת החשמל – נשמר לכל הפרויקטים'],
-  ['smsMail','דוא״ל לקבלת עדכונים (קבוע)','text','דוא״ל קבוע של המשרד לקבלת עדכונים מחברת החשמל – נשמר לכל הפרויקטים']
+  ['sms','טלפון לקבלת SMS (קבוע)','num','מספר קבוע של המשרד לקבלת הודעות SMS מחברת החשמל – נשמר לכל הפרויקטים']
 ];
 /* פרטים קבועים של המשרד – נשמרים בדפדפן ואינם מתאפסים בטופס חדש */
-const FIXED_KEYS=['sms','smsMail'], FIXED_DEF={sms:'055-9506647', smsMail:''};
+const FIXED_KEYS=['sms'], FIXED_DEF={sms:'055-9506647'};
 function fixedGet(){ let o={}; try{ o=JSON.parse(localStorage.getItem('tiktin_iec_fixed')||'{}')||{}; }catch(e){} return Object.assign({},FIXED_DEF,o); }
 function fixedSet(k,v){ try{ const o=fixedGet(); o[k]=v; localStorage.setItem('tiktin_iec_fixed',JSON.stringify(o)); }catch(e){} }
 
@@ -954,7 +953,7 @@ function sections(O, iss){
   secs.push({title:'פרטי הפרויקט והלקוח', kv:[
     ['שם הפרויקט',P.name||'–'],['מספר פרויקט',P.num||'–'],['שם חברת הלקוח',P.client||'–'],['ח.פ. של הלקוח',P.hp||'–'],
     ['יישוב',P.city||'–'],['רחוב ומספר בית',[P.street,P.house].filter(Boolean).join(' ')||'– (נשאר ריק באתר)'],['גוש וחלקה',P.gush||'–'],
-    ['איש קשר',P.contact||'–'],['טלפון',P.phone||'–'],['דוא״ל',P.email||'–'],['ראש צוות מטפל',P.leader?`${P.leader} – [${code}]`:'–'],['טלפון לקבלת SMS מחברת החשמל',P.sms||'–'],['דוא״ל לקבלת עדכונים מחברת החשמל',P.smsMail||'–'],
+    ['איש קשר',P.contact||'–'],['טלפון',P.phone||'–'],['דוא״ל',P.email||'–'],['ראש צוות מטפל',P.leader?`${P.leader} – [${code}]`:'–'],['טלפון לקבלת SMS מחברת החשמל',P.sms||'–'],
     ['חשבון העבודה באתר','טיקטין תכנון חשמל (2003) בע״מ · מבט יועץ חשמל']]});
   secs.push({title:'סיכום', kpi:[['הזמנות לפתיחה',ord.length],['הזמנות קבועות',perm],['בניינים',PROJ.list.length],['סה״כ דירות',units],['סה״כ חיבורים',conns]]});
   secs.push({title:'בניינים ודירות', head:['בניין','קומות','דירות','מיקום מונים','3X25','3X40','3X63','3X80','3X100','אחר','חיבור ציבורי'],
