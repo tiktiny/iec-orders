@@ -193,6 +193,18 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
 @media (max-width:560px){#bldTypeCell{grid-column:1/-1}}
 #bldTypeSt{font-weight:400;color:var(--muted);font-size:12px}
 #bldTypeSt.warn{color:var(--red)}
+.fld select.bad{border-color:var(--red);outline:1px solid var(--red)}
+.endsep{display:flex;align-items:center;gap:12px;margin:22px 0 18px;color:var(--red);font-weight:700;font-size:14px}
+.endsep::before,.endsep::after{content:"";flex:1;border-top:3px solid var(--red)}
+.endsep span{white-space:nowrap}
+@media (max-width:560px){.endsep span{white-space:normal;text-align:center}}
+.ordtbl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px}
+@media (max-width:900px){.ordtbl{grid-template-columns:1fr}}
+.orow{display:grid;grid-template-columns:28px minmax(0,1.1fr) minmax(0,1.2fr) minmax(0,1fr);gap:8px;align-items:center;font-size:13.5px}
+.orow .oseq{color:var(--muted);text-align:center}
+.orow .okind{font-weight:600}
+.orow .otgt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:560px){.orow{grid-template-columns:24px minmax(0,1fr) minmax(0,1fr)}.orow .fld{grid-column:2/-1}}
 .gowrap{position:relative}
 .gomenu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:6px;min-width:320px;display:flex;flex-direction:column;gap:4px}
 .gomenu[hidden]{display:none}
@@ -228,6 +240,8 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
     <button class="btn primary" id="bImport" title="קליטת תמהיל דירות מקובץ PDF, Word, Excel או מצגת">📥 קליטה מקובץ</button>
     <input type="file" id="fImport" accept=".pdf,.docx,.xlsx,.xlsm,.xls,.csv,.pptx" hidden>
     <button class="btn ibtn" id="bImpHelp" title="אילו קבצים אפשר לקלוט ואיך להכין אותם">ⓘ</button>
+    <button class="btn" id="bGl" title="קליטת פרטי הפרויקט, הבניינים, המסחר והחניון מאפליקציית הנחיות החשמל – מהטופס הפתוח בה או מקובץ הנחיות שמור (JSON)">📄 קליטה מההנחיות</button>
+    <input type="file" id="fGl" accept=".json,application/json" hidden>
     <button class="btn" id="bReset" title="איפוס כל השדות">↺ איפוס טופס</button>
   </div>
   <div class="tgrp">
@@ -246,6 +260,7 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
     <button class="btn" id="bXlsx" title="ייצוא המסמך לקובץ אקסל – זה הקובץ שה-SKILL קורא לפתיחת ההזמנות">ייצוא Excel</button>
     <button class="btn" id="bDoc" title="ייצוא המסמך לקובץ וורד">ייצוא Word</button>
     <button class="btn" id="bPdf" title="ייצוא המסמך לקובץ PDF">ייצוא PDF</button>
+    <button class="btn" id="bToT" title="שמירת המסמך ב-Word וב-PDF ישירות לתיקיית הפרויקט בכונן T. בפעם הראשונה בוחרים את התיקייה הראשית של הפרויקטים; התיקייה של הפרויקט נמצאת לפי מספר הפרויקט. Shift+לחיצה – בחירת תיקייה ראשית אחרת">📁 שמירה לתיקיית הפרויקט</button>
   </div>
 </div>
 <div class="imphelp" id="impHelp" hidden>
@@ -301,16 +316,14 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
       <b>חיבור ציבורי</b> – החיבור לשטחים המשותפים של הבניין, נכלל בהזמנה של אותו בניין.<br>
       סה״כ הדירות ופירוט החיבורים מחושבים אוטומטית ממקבצי הקומות.
     </div></details>
-    <div class="grid g5" id="bldGrid">
+    <div class="grid g4" id="bldGrid">
       <label class="f"><span class="lbl">שם בניין / כניסה</span><span class="fld"><input id="building" type="text" title="כך יופיע הבניין בכתובת החיבור, למשל בניין A"></span></label>
       <label class="f"><span class="lbl">מספר קומות מעל קומת קרקע</span><span class="fld"><input id="floors" type="text" inputmode="numeric" title="הקומה העליונה. קומת קרקע = 0"></span></label>
       <label class="f"><span class="lbl">גובה רצפת קומת המגורים האחרונה [מ׳]</span><span class="fld"><input id="height" type="text" inputmode="decimal" title="הגובה הקובע: מרצפת קומת הכניסה (קרקע) עד רצפת קומת המגורים האחרונה. אם ריק – מוערך לפי מספר הקומות (כ-2.9 מ׳ לקומה)"></span></label>
       <label class="f"><span class="lbl">מיקום מונים</span><span class="fld"><select id="meters" data-def="" title="שדה חובה: ריכוז מונים בחדר מונים או פיזור מונים בקומות – נכתב בתחילת הערות ההזמנה באתר"><option value="">— בחירה (חובה) —</option><option value="ריכוז מונים">ריכוז מונים</option><option value="פיזור מונים">פיזור מונים</option></select></span></label>
-      <label class="f"><span class="lbl">חיבור ציבורי לבניין</span><span class="fld"><select id="pub" data-def="" title="גודל החיבור הציבורי של הבניין"></select></span></label>
     </div>
-    <div class="grid g5" style="margin-top:10px">
+    <div class="grid g4" style="margin-top:10px">
       <label class="f"><span class="lbl">סה״כ דירות בבניין – מחושב</span><span class="ro hl" id="unitsTotal" title="מחושב אוטומטית ממקבצי הקומות">0</span></label>
-      <label class="f"><span class="lbl">מיקום מונים שייכנס להזמנה</span><span class="ro" id="metersEff" title="הבחירה שתיכנס להזמנה באתר">—</span></label>
       <div class="f" id="bldTypeCell"><span class="lbl">קטגוריית הבניין <span id="bldTypeSt"></span></span><div class="catseg" id="bldType" role="group" aria-label="קטגוריית הבניין"></div></div>
       <label class="f"><span class="lbl">חיבורי דירות לפי גודל – מחושב</span><span class="ro" id="connsTotal" title="כמות דירות לכל גודל חיבור">—</span></label>
       <label class="f"><span class="lbl">כתובת החיבור להזמנה</span><span class="ro" id="addrBld" title="מהות + בניין + פרויקט + עיר + קוד ראש צוות">—</span></label>
@@ -320,12 +333,15 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
       <h3 class="sub">מקבצי קומות ודירות</h3>
       <details class="help"><summary>הסבר</summary><div>
         כל מקבץ הוא טווח קומות זהות (מקומה עד קומה, קרקע = 0). בתוך מקבץ מגדירים סוגי דירות: כמות בקומה, מס׳ חדרים, שטח (לא חובה) וגודל חיבור.<br>
-        גודל חיבור ברירת מחדל: 2–4 חדרים – 3X25A תמיד (בלי קשר לשטח). 5 חדרים – 3X25A, ומשטח 120 מ״ר ומעלה – 3X40A. 6 חדרים ומעלה – 3X40A אוטומטית. אפשר לשנות ידנית (לדירות מיוחדות 3X63A ומעלה).<br>
+        גודל חיבור ברירת מחדל: 2–4 חדרים – 3X25A תמיד (בלי קשר לשטח). 5 חדרים – 3X25A, ומשטח 120 מ״ר ומעלה – 3X40A. 6 חדרים ומעלה – 3X40A אוטומטית. דירה בשטח מעל 180 מ״ר – 3X63A. אפשר לשנות ידנית.<br>מס׳ חדרים ושטח – רשות (לפחות אחד מהם קובע את גודל החיבור).<br>
         לשינוי בקומה בודדת – מגדירים מקבץ של קומה אחת. אסור שמקבצים יחפפו.
       </div></details>
       <div id="groups" style="margin-top:10px"></div>
       <button class="btn small" id="addGroup" title="הוספת מקבץ קומות חדש">＋ הוספת מקבץ</button>
       <div class="muted" id="totals" style="margin-top:8px"></div>
+      <div class="grid g2" style="margin-top:12px">
+        <label class="f"><span class="lbl">חיבור ציבורי לבניין</span><span class="fld"><select id="pub" data-def="" title="גודל החיבור הציבורי של הבניין – נכלל בהזמנה של הבניין"></select></span></label>
+      </div>
     </div>
     <div class="bcol">
       <h3 class="sub">מסחר, משרדים ומבני ציבור בבניין</h3>
@@ -373,6 +389,8 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
     <div class="grid g4" id="tempGrid"></div>
   </div>
 
+  <div class="endsep" role="separator"><span>סוף הזנת נתוני הפרויקט · מכאן – הצהרות, אופן השליחה ומסמכים</span></div>
+
   <div class="card">
     <h2><span class="num">6</span>הצהרות ואופן השליחה</h2>
     <details class="help"><summary>הסבר</summary><div>
@@ -400,13 +418,26 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
     <div id="status"></div>
     <div id="report" class="report"></div>
   </div>
+  <div class="card">
+    <h2><span class="num">9</span>אחרי פתיחת ההזמנות – מספרי הזמנה וטבלת פירוט דירות</h2>
+    <details class="help"><summary>הסבר</summary><div>
+      אחרי שההזמנות נפתחו באתר חברת החשמל רושמים כאן את מספר ההזמנה של כל הזמנה – ידנית, או בקליטה מקובץ האקסל שה-SKILL מילא (עמודה "מספר הזמנה שהתקבל" בגיליון "הזמנות").<br>
+      "טבלת פירוט דירות" מפיקה קובץ Excel: לכל בניין – מספר ההזמנה, כל הדירות לפי קומות עם מספר דירה וגודל חיבור, סיכום לפי גודל חיבור והחיבור הציבורי, ובסוף החיבורים שנפתחו בהזמנות נפרדות עם מספרי ההזמנות.
+    </div></details>
+    <div id="ordNos" style="margin-top:10px"></div>
+    <div class="tgrp" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="bOrdLoad" title="קליטת מספרי ההזמנות מקובץ האקסל שהופק מהטופס ומולא על ידי ה-SKILL">📥 קליטת מספרי הזמנות מהאקסל</button>
+      <input type="file" id="fOrdLoad" accept=".xlsx" hidden>
+      <button class="btn primary" id="bAptXlsx" title="הפקת טבלת פירוט דירות עם מספרי ההזמנות – Excel">טבלת פירוט דירות – Excel</button>
+    </div>
+  </div>
 </section>
 </main>
 <div id="impDlg" class="dlg"><div class="dbox"><h2>קליטת בניינים מהקובץ</h2><div class="dbody"></div>
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V8';
+const VERSION = 'V9';
 const VDATE = '09.11.2026';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
@@ -451,6 +482,7 @@ function demand(rooms, conn){
   return {p:0, subst:true};
 }
 function defaultConn(rooms, area){
+  if(parseFloat(area)>180) return '3x63';   // דירה מעל 180 מ״ר – 3X63A
   if(!rooms){ const a=parseFloat(area); return isFinite(a)&&a>0 ? (a>120?'3x40':'3x25') : ''; }  // ללא חדרים – לפי שטח: עד 120 מ״ר 3X25, מעל 3X40
   if(rooms==='2-3'||rooms==='4') return '3x25';
   if(rooms==='5') return parseFloat(area)>=120 ? '3x40' : '3x25';
@@ -484,8 +516,14 @@ const PROJ_FIELDS = [
   ['contact','איש קשר','text','איש הקשר להזמנה'],
   ['phone','טלפון','num','טלפון איש הקשר'],
   ['email','דוא״ל','text','דוא״ל איש הקשר'],
-  ['leader','ראש צוות מטפל','leader','הקוד נוסף בסוגריים מרובעים בסוף כתובת החיבור']
+  ['leader','ראש צוות מטפל','leader','הקוד נוסף בסוגריים מרובעים בסוף כתובת החיבור'],
+  ['sms','טלפון לקבלת SMS (קבוע)','num','מספר קבוע של המשרד לקבלת הודעות SMS מחברת החשמל – נשמר לכל הפרויקטים'],
+  ['smsMail','דוא״ל לקבלת עדכונים (קבוע)','text','דוא״ל קבוע של המשרד לקבלת עדכונים מחברת החשמל – נשמר לכל הפרויקטים']
 ];
+/* פרטים קבועים של המשרד – נשמרים בדפדפן ואינם מתאפסים בטופס חדש */
+const FIXED_KEYS=['sms','smsMail'], FIXED_DEF={sms:'055-9506647', smsMail:''};
+function fixedGet(){ let o={}; try{ o=JSON.parse(localStorage.getItem('tiktin_iec_fixed')||'{}')||{}; }catch(e){} return Object.assign({},FIXED_DEF,o); }
+function fixedSet(k,v){ try{ const o=fixedGet(); o[k]=v; localStorage.setItem('tiktin_iec_fixed',JSON.stringify(o)); }catch(e){} }
 
 /* ---------- state ---------- */
 function defaultBuilding(i){
@@ -493,23 +531,24 @@ function defaultBuilding(i){
     groups:[{from:'',to:'',types:[{count:'',rooms:'',area:'',conn:'',auto:true}]}]};
 }
 function defaultProj(){
-  const p={}; PROJ_FIELDS.forEach(([k])=>p[k]='');
+  const p={}; PROJ_FIELDS.forEach(([k])=>p[k]=''); const fx=fixedGet(); FIXED_KEYS.forEach(k=>p[k]=fx[k]||'');
   return {format:FORMAT_ID, v:1, project:p, list:[defaultBuilding(0)], active:0,
     park:newPark(), extras:[], temp:{size:'', link:'0'},
     decl:{poa:true, purpose:true, terms:true},
     send:{mode:'auto', wait:'', after:'אשר ושלח את ההזמנה'},
-    docs:Object.fromEntries(DOCS.map(d=>[d.k,{file:'',got:'לא'}]))};
+    docs:Object.fromEntries(DOCS.map(d=>[d.k,{file:'',got:'לא'}])), ordNo:{}};
 }
 function projFrom(o){
   const d=defaultProj(); if(!o||typeof o!=='object') return d;
   const p={...d, ...o};
-  p.project={...d.project, ...(o.project||{})};
+  p.project={...d.project, ...(o.project||{})}; FIXED_KEYS.forEach(k=>{ if(!String(p.project[k]||'').trim()) p.project[k]=d.project[k]; });
   p.list=(Array.isArray(o.list)&&o.list.length?o.list:d.list).map((b,i)=>Object.assign(defaultBuilding(i),b));
   p.active=Math.min(Math.max(0,+o.active||0),p.list.length-1);
   p.extras=Array.isArray(o.extras)?o.extras.map(x=>{ const y=Object.assign(newExtra(),x); if(x.blds!=null&&x.loc==null) y.loc=x.blds; if(y.type==='muni') y.type='public'; if(y.type==='emp') y.type='office'; if(!XTYPES[y.type]) y.type='other'; if(y.type==='park') y.assign='project'; delete y.blds; return y; }):[];
   p.park=Object.assign(newPark(), o.park||{}); p.park.ev=Object.assign(newPark().ev, (o.park||{}).ev||{}); p.park.type='park'; p.park.ev.type='ev';
   { const oldP=p.extras.findIndex(x=>x.type==='park'); if(oldP>=0){ if(!o.park){ const x=p.extras[oldP]; Object.assign(p.park,{desc:x.desc,loc:x.loc,size:x.size,open:x.open,note:x.note}); } } p.extras=p.extras.filter(x=>x.type!=='park'&&x.type!=='ev'); }
   p.temp={...d.temp,...(o.temp||{})}; p.decl={...d.decl,...(o.decl||{})}; p.send={...d.send,...(o.send||{})};
+  p.ordNo=(o.ordNo&&typeof o.ordNo==='object')?{...o.ordNo}:{};
   p.docs={...d.docs}; Object.keys(o.docs||{}).forEach(k=>{ p.docs[k]={...d.docs[k],...o.docs[k]}; });
   return p;
 }
@@ -529,12 +568,18 @@ const sizeOpts = (cur, empty='—') => `<option value="" ${!cur?'selected':''}>$
 function renderTabs(){
   const el=document.getElementById('tabs');
   el.innerHTML = PROJ.list.map((b,i)=>`<button class="tab ${i===PROJ.active?'on':''}" data-i="${i}" title="מעבר לבניין">${esc(bldName(b,i))}${PROJ.list.length>1?`<span class="tx" data-del="${i}" title="הסרת הבניין">✕</span>`:''}</button>`).join('') +
-    `<button class="tab add" id="tabAdd" title="הוספת בניין נוסף – לכל בניין נפתחת הזמנה נפרדת">＋ בניין</button>`;
+    `<button class="tab add" id="tabAdd" title="הוספת בניין נוסף – לכל בניין נפתחת הזמנה נפרדת">＋ בניין</button>`+
+    `<button class="tab add" id="tabDup" title="שכפול הבניין בלשונית הפעילה – כל נתוני הבניין והמקבצים מועתקים לבניין חדש">⧉ שכפול בניין</button>`;
   el.querySelectorAll('.tab[data-i]').forEach(t=>t.addEventListener('click',e=>{
     const del=e.target.closest('[data-del]');
     if(del){ const i=+del.dataset.del; if(!confirm(`להסיר את ${bldName(PROJ.list[i],i)}?`)) return; PROJ.list.splice(i,1); PROJ.active=Math.min(PROJ.active,PROJ.list.length-1); S=PROJ.list[PROJ.active]; fullRender(); return; }
     PROJ.active=+t.dataset.i; S=PROJ.list[PROJ.active]; fullRender(); }));
   document.getElementById('tabAdd').addEventListener('click',()=>{ const st=defaultBuilding(PROJ.list.length); PROJ.list.push(st); PROJ.active=PROJ.list.length-1; S=st; fullRender(); });
+  document.getElementById('tabDup').addEventListener('click',()=>{
+    const st=JSON.parse(JSON.stringify(S)), used=new Set(PROJ.list.map((b,i)=>bldName(b,i)));
+    let nm=''; for(let k=0;k<26*3&&!nm;k++){ const c='בניין '+(k<26?String.fromCharCode(65+k):String.fromCharCode(65+Math.floor(k/26)-1)+String.fromCharCode(65+k%26)); if(!used.has(c)) nm=c; }
+    st.building=nm||(bldName(S,PROJ.active)+' (עותק)');
+    PROJ.list.push(st); PROJ.active=PROJ.list.length-1; S=st; fullRender(); });
 }
 
 /* ---------- field helpers ---------- */
@@ -569,10 +614,10 @@ function renderProject(){
   g.innerHTML = PROJ_FIELDS.map(([k,l,t,tip])=>{
     let inner;
     if(t==='leader') inner=`<select data-p="${k}" data-def="" title="${tip}"><option value="" ${!P[k]?'selected':''}>— בחירה —</option>${LEADERS.map(([n,c])=>`<option value="${esc(n)}" ${P[k]===n?'selected':''}>${esc(n)} – ${c}</option>`).join('')}</select>`;
-    else inner=`<input data-p="${k}" type="text" ${t==='num'?'inputmode="numeric"':''} ${k==='email'?'inputmode="email" dir="ltr"':''} value="${esc(P[k])}" title="${tip}">`;
+    else inner=`<input data-p="${k}" type="text" ${t==='num'?'inputmode="numeric"':''} ${(k==='email'||k==='smsMail')?'inputmode="email" dir="ltr"':''} value="${esc(P[k])}" title="${tip}">`;
     return `<label class="f"><span class="lbl">${l}</span>${fld(inner)}</label>`;
   }).join('');
-  g.querySelectorAll('[data-p]').forEach(el=>bind(el,()=>{ P[el.dataset.p]=el.value; recalc(); }));
+  g.querySelectorAll('[data-p]').forEach(el=>bind(el,()=>{ P[el.dataset.p]=el.value; if(FIXED_KEYS.includes(el.dataset.p)) fixedSet(el.dataset.p, el.value); recalc(); }));
 }
 
 /* ---------- 2. building top ---------- */
@@ -595,8 +640,8 @@ function renderGroups(){
       ${g.types.map((t,ti)=>`
       <div class="trow" data-t="${ti}">
         <label class="f"><span class="lbl">דירות בקומה</span>${fld(`<input data-tf="count" inputmode="numeric" value="${t.count}" title="כמות דירות מסוג זה בכל קומה">`)}</label>
-        <label class="f"><span class="lbl">חדרים</span>${fld(`<select data-tf="rooms" data-def="" title="מס׳ חדרים – קובע גודל חיבור ברירת מחדל"><option value="" ${!t.rooms?'selected':''}>—</option>${ROOMS.map(r=>`<option value="${r}" ${t.rooms===r?'selected':''}>${ROOM_LBL[r]}</option>`).join('')}</select>`)}</label>
-        <label class="f"><span class="lbl">שטח [מ״ר]</span>${fld(`<input data-tf="area" inputmode="decimal" value="${t.area}" title="לא חובה – קובע גודל חיבור ברירת מחדל">`)}</label>
+        <label class="f"><span class="lbl">חדרים (רשות)</span>${fld(`<select data-tf="rooms" data-def="" title="מס׳ חדרים – קובע גודל חיבור ברירת מחדל"><option value="" ${!t.rooms?'selected':''}>—</option>${ROOMS.map(r=>`<option value="${r}" ${t.rooms===r?'selected':''}>${ROOM_LBL[r]}</option>`).join('')}</select>`)}</label>
+        <label class="f"><span class="lbl">שטח [מ״ר] (רשות)</span>${fld(`<input data-tf="area" inputmode="decimal" value="${t.area}" title="לא חובה – קובע גודל חיבור ברירת מחדל">`)}</label>
         <label class="f"><span class="lbl">חיבור&nbsp;<span id="sub${gi}_${ti}"></span></span>${fld(`<select data-tf="conn" data-def="" title="גודל חיבור הדירה – נכנס להזמנה"><option value="" ${!t.conn?'selected':''}>—</option>${CONNS.map(c=>`<option value="${c}" ${t.conn===c?'selected':''}>${CONN_LBL(c)}</option>`).join('')}</select>`)}</label>
         <button class="del" data-act="delt" title="מחיקת סוג הדירה">✕</button>
       </div>`).join('')}
@@ -909,7 +954,7 @@ function sections(O, iss){
   secs.push({title:'פרטי הפרויקט והלקוח', kv:[
     ['שם הפרויקט',P.name||'–'],['מספר פרויקט',P.num||'–'],['שם חברת הלקוח',P.client||'–'],['ח.פ. של הלקוח',P.hp||'–'],
     ['יישוב',P.city||'–'],['רחוב ומספר בית',[P.street,P.house].filter(Boolean).join(' ')||'– (נשאר ריק באתר)'],['גוש וחלקה',P.gush||'–'],
-    ['איש קשר',P.contact||'–'],['טלפון',P.phone||'–'],['דוא״ל',P.email||'–'],['ראש צוות מטפל',P.leader?`${P.leader} – [${code}]`:'–'],
+    ['איש קשר',P.contact||'–'],['טלפון',P.phone||'–'],['דוא״ל',P.email||'–'],['ראש צוות מטפל',P.leader?`${P.leader} – [${code}]`:'–'],['טלפון לקבלת SMS מחברת החשמל',P.sms||'–'],['דוא״ל לקבלת עדכונים מחברת החשמל',P.smsMail||'–'],
     ['חשבון העבודה באתר','טיקטין תכנון חשמל (2003) בע״מ · מבט יועץ חשמל']]});
   secs.push({title:'סיכום', kpi:[['הזמנות לפתיחה',ord.length],['הזמנות קבועות',perm],['בניינים',PROJ.list.length],['סה״כ דירות',units],['סה״כ חיבורים',conns]]});
   secs.push({title:'בניינים ודירות', head:['בניין','קומות','דירות','מיקום מונים','3X25','3X40','3X63','3X80','3X100','אחר','חיבור ציבורי'],
@@ -942,8 +987,7 @@ function recalc(){
   S.groups.forEach((g,gi)=>g.types.forEach((t,ti)=>{ const el=document.getElementById(`sub${gi}_${ti}`); if(el){ const d=demand(t.rooms,t.conn); el.innerHTML = d.p? `<span title="שיא ביקוש לדירה לפי חח״י${d.subst?' – צירוף לא קיים בטבלה, נלקח מהשורה הקרובה':''}">(${fmt(d.p)} kVA${d.subst?' ✱':''})</span>` : ''; } }));
   document.getElementById('bldTitle').textContent = bldName(S,PROJ.active);
   document.getElementById('unitsTotal').textContent = R.units;
-  document.getElementById('metersEff').textContent = R.meters || 'לא נבחר – חובה';
-  document.getElementById('metersEff').classList.toggle('bad', !R.meters);
+  document.getElementById('meters').classList.toggle('bad', !R.meters);
   drawCat();
   document.getElementById('connsTotal').textContent = connStr(R.byConn) || '—';
   document.getElementById('totals').innerHTML = `סה״כ ${R.units} דירות · ${connStr(R.byConn)||'אין חיבורים'}${R.kva?` · Σ שיא ביקוש ${fmt(R.kva)} kVA`:''}`;
@@ -1039,7 +1083,8 @@ function goTo(key){
 
 document.getElementById('bReset').addEventListener('click',()=>{ if(!confirm('לאפס את כל השדות?')) return; PROJ=defaultProj(); S=PROJ.list[0]; idbClear(); DOCSTORE={}; fullRender(); });
 const fname = ext => `פתיחת הזמנות חחי - ${PROJ.project.name||'פרויקט'}.${ext}`;
-function download(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); }
+let DL_SINK=null;   // כשמוגדר – הקבצים נאספים (לשמירה לתיקייה) במקום הורדה
+function download(blob,name){ if(DL_SINK){ DL_SINK.push({blob,name}); return; } const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); }
 document.getElementById('bSave').addEventListener('click',()=>download(new Blob([JSON.stringify(PROJ,null,1)],{type:'application/json'}), fname('json')));
 document.getElementById('bLoad').addEventListener('click',()=>document.getElementById('fLoad').click());
 document.getElementById('fLoad').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return;
@@ -1050,7 +1095,7 @@ document.getElementById('fLoad').addEventListener('change',async e=>{ const f=e.
       const wb=new ExcelJS.Workbook(); await wb.xlsx.load(await f.arrayBuffer());
       const ws=wb.getWorksheet('נתונים למערכת'); if(!ws) throw new Error('nodata');
       let txt=''; for(let r=4;r<=ws.rowCount;r++){ const v=ws.getCell(r,1).value; if(typeof v==='string') txt+=v; }
-      o=JSON.parse(txt).form;
+      o=JSON.parse(txt).form; const on=readOrdNos(wb, JSON.parse(txt).orders); if(on) o.ordNo=Object.assign({},o.ordNo||{},on);
     } else o=JSON.parse(await f.text());
     PROJ=projFrom(o); S=PROJ.list[PROJ.active]; fullRender();
   }catch(err){ alert(err.message==='nodata'?'בקובץ האקסל אין גיליון "נתונים למערכת" – יש לבחור קובץ שהופק מהטופס.':'קובץ לא תקין'); }
@@ -1098,7 +1143,7 @@ function secBlocks(secs){
 }
 
 /* ---------- PDF ---------- */
-document.getElementById('bPdf').addEventListener('click',async()=>{
+async function exportPdf(){
   if(!window.html2canvas||!window.jspdf){ alert('ספריית PDF לא נטענה – בדוק חיבור לאינטרנט'); return; }
   const btn=document.getElementById('bPdf'); btn.disabled=true; const old=btn.textContent; btn.textContent='מכין PDF…';
   const host=document.createElement('div'); host.className='rp'; host.style.cssText='position:fixed;left:-10000px;top:0;width:794px;z-index:-1';
@@ -1115,12 +1160,13 @@ document.getElementById('bPdf').addEventListener('click',async()=>{
     pages.forEach((pg,i)=>pg.querySelector('.rf').innerHTML=rFooter(i+1,pages.length));
     const {jsPDF}=window.jspdf; const pdf=new jsPDF('p','mm','a4');
     for(let i=0;i<pages.length;i++){ const c=await html2canvas(pages[i],{scale:2,backgroundColor:'#ffffff'}); if(i) pdf.addPage(); pdf.addImage(c.toDataURL('image/jpeg',0.93),'JPEG',0,0,210,297); }
-    pdf.save(fname('pdf'));
+    download(pdf.output('blob'), fname('pdf'));
   } finally { host.remove(); btn.disabled=false; btn.textContent=old; }
-});
+}
+document.getElementById('bPdf').addEventListener('click',()=>exportPdf());
 
 /* ---------- Word ---------- */
-document.getElementById('bDoc').addEventListener('click',async()=>{
+async function exportDoc(){
   if(!window.docx){ alert('ספריית Word לא נטענה – בדוק חיבור לאינטרנט'); return; }
   const btn=document.getElementById('bDoc'); btn.disabled=true; const old=btn.textContent; btn.textContent='מכין Word…';
   try{
@@ -1156,7 +1202,8 @@ document.getElementById('bDoc').addEventListener('click',async()=>{
       sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1500,bottom:1000,left:850,right:850,header:400,footer:400}}},headers:{default:header},footers:{default:footer},children}]});
     download(await Packer.toBlob(doc), fname('docx'));
   } finally { btn.disabled=false; btn.textContent=old; }
-});
+}
+document.getElementById('bDoc').addEventListener('click',()=>exportDoc());
 
 /* ---------- Excel ---------- */
 document.getElementById('bXlsx').addEventListener('click',async()=>{
@@ -1202,7 +1249,7 @@ document.getElementById('bXlsx').addEventListener('click',async()=>{
   const body=(ws)=>{ ws.eachRow((r,ri)=>{ if(ri===1) return; r.eachCell({includeEmpty:true},c=>{ c.font={name:'Arial',size:10}; c.alignment={horizontal:'right',vertical:'middle',wrapText:true,readingOrder:'rtl'}; c.border=border; }); }); };
   const w1=wb.addWorksheet('הזמנות',{views:[{rightToLeft:true,state:'frozen',ySplit:1}]});
   hdr(w1,['#','סוג ההזמנה','מיועדת ל־','כתובת החיבור (תיאור)','תווים','מיקום מונים','פירוט חיבורים','הערות להזמנה','קישור להזמנה קבועה (#)','מספר הזמנה שהתקבל','מצב','מונים – נבחר באתר','אומת לפני שליחה','נוסח כתובת שנשמר באתר','הערות ביצוע'],[5,18,18,50,7,14,34,50,12,16,14,14,12,40,30]);
-  O.orders.forEach(o=>{ const ls=o.link!=null?((O.orders.find(x=>x.bld===o.link)||{}).seq||''):''; w1.addRow([o.seq,o.kind,o.target,o.addr,o.len,o.meters,o.conns,o.note,ls,'','טרם נפתח','','','','']); });
+  O.orders.forEach(o=>{ const ls=o.link!=null?((O.orders.find(x=>x.bld===o.link)||{}).seq||''):''; const on=ordNoOf(o); w1.addRow([o.seq,o.kind,o.target,o.addr,o.len,o.meters,o.conns,o.note,ls,on,on?'נפתח':'טרם נפתח','','','','']); });
   body(w1);
   const w2=wb.addWorksheet('מסמכים',{views:[{rightToLeft:true,state:'frozen',ySplit:1}]});
   hdr(w2,['סוג המסמך','נדרש','שם הקובץ','התקבל'],[30,26,50,10]);
@@ -1455,6 +1502,203 @@ function matrixToBuildings(recs){
   });
   return out.sort((a,b)=>String(a.name).localeCompare(String(b.name),'he',{numeric:true}));
 }
+
+/* ================= V7 – הערות ליטל ================= */
+
+/* ---------- קבלת נתונים מאפליקציה אחרת של המשרד (למשל גודל חיבור זמני) + כפתור חזרה ---------- */
+const TK_HANDOFF=(function(KEY){ let h=null; try{ const u=new URL(location.href);
+  if(u.searchParams.has('handoff')){ const o=JSON.parse(localStorage.getItem('tiktin_handoff')||'null');
+    if(o&&o.to===KEY&&Date.now()-o.ts<1800000){ h=o; localStorage.removeItem('tiktin_handoff'); sessionStorage.setItem('tiktin_return_'+KEY,JSON.stringify({url:o.returnUrl,title:o.fromTitle})); }
+    u.searchParams.delete('handoff'); history.replaceState(null,'',u.pathname+u.search+u.hash); }
+  const r=JSON.parse(sessionStorage.getItem('tiktin_return_'+KEY)||'null');
+  if(r&&r.url){ const add=()=>{ const hd=document.querySelector('header'); if(!hd||hd.querySelector('.tk-back')) return; const a=document.createElement('a'); a.href=r.url; a.className='tk-back'; a.textContent='↩ חזרה ל'+r.title; a.title='חזרה לאפליקציה הקודמת'; a.style.cssText='display:inline-flex;align-items:center;height:34px;padding:0 12px;border:1.5px solid #c8202f;border-radius:8px;color:#c8202f;background:#fff;font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap;flex:none'; a.addEventListener('click',()=>{ try{ sessionStorage.removeItem('tiktin_return_'+KEY); }catch(e){} }); hd.appendChild(a); };
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',add); else add(); }
+}catch(e){} return h; })('iec-orders');
+if(TK_HANDOFF&&TK_HANDOFF.state){ try{ const st=TK_HANDOFF.state;
+  const tz=String((st.temp&&st.temp.size)||st.tempSize||'').toLowerCase().replace(/\s/g,'').replace('×','x');
+  if(tz && BIG.includes(tz)) PROJ.temp.size=tz;
+  if(st.temp && st.temp.link!=null) PROJ.temp.link=String(st.temp.link);
+  persist(); }catch(e){} }
+
+/* ---------- מספרי הזמנות ---------- */
+const ordKey = o => o.kind+'|'+o.target;
+const ordNoOf = o => String((PROJ.ordNo||{})[ordKey(o)]||'').trim();
+function cellTxt(v){ if(v==null) return ''; if(typeof v==='object'){ if(v.richText) return v.richText.map(t=>t.text).join(''); if(v.text!=null) return String(v.text); if(v.result!=null) return String(v.result); } return String(v); }
+function readOrdNos(wb){
+  const ws=wb.getWorksheet('הזמנות'); if(!ws) return null; const out={}; let n=0;
+  for(let r=2;r<=ws.rowCount;r++){ const kind=cellTxt(ws.getCell(r,2).value).trim(), target=cellTxt(ws.getCell(r,3).value).trim(), no=cellTxt(ws.getCell(r,10).value).trim();
+    if(kind && no){ out[kind+'|'+target]=no; n++; } }
+  return n?out:null;
+}
+let ORD_SIG='';
+function renderOrdNos(force){
+  const box=document.getElementById('ordNos'); if(!box||!LAST) return;
+  const ords=LAST.O.orders, sig=ords.map(ordKey).join('§');
+  if(!force && sig===ORD_SIG) return; ORD_SIG=sig;
+  box.innerHTML=`<div class="ordtbl">${ords.map(o=>`<div class="orow"><span class="oseq">${o.seq}</span><span class="okind">${esc(o.kind)}</span><span class="otgt">${esc(o.target)}</span>
+    <span class="fld"><input data-ok="${esc(ordKey(o))}" inputmode="numeric" placeholder="מספר הזמנה" value="${esc(ordNoOf(o))}" title="מספר ההזמנה שהתקבל באתר חברת החשמל"></span></div>`).join('')}</div>`;
+  box.querySelectorAll('[data-ok]').forEach(el=>bind(el,()=>{ PROJ.ordNo=PROJ.ordNo||{}; const v=el.value.trim(); if(v) PROJ.ordNo[el.dataset.ok]=v; else delete PROJ.ordNo[el.dataset.ok]; persist(); }));
+  enhance(box);
+}
+{ const _rc=recalc; recalc=function(){ _rc.apply(this,arguments); renderOrdNos(); }; }
+document.getElementById('bOrdLoad').addEventListener('click',()=>document.getElementById('fOrdLoad').click());
+document.getElementById('fOrdLoad').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  try{ if(!window.ExcelJS) throw new Error('lib'); const wb=new ExcelJS.Workbook(); await wb.xlsx.load(await f.arrayBuffer());
+    const on=readOrdNos(wb); if(!on){ alert('לא נמצאו מספרי הזמנות בקובץ.\nיש לבחור את קובץ האקסל שהופק מהטופס, אחרי שה-SKILL רשם בגיליון "הזמנות" את מספרי ההזמנות (עמודה "מספר הזמנה שהתקבל").'); return; }
+    const keys=new Set(LAST.O.orders.map(ordKey)); let hit=0, miss=0;
+    Object.entries(on).forEach(([k,v])=>{ if(keys.has(k)){ PROJ.ordNo[k]=v; hit++; } else miss++; });
+    persist(); renderOrdNos(true);
+    alert(`נקלטו ${hit} מספרי הזמנות.`+(miss?`\n${miss} שורות בקובץ לא תאמו להזמנות בטופס (ייתכן שהטופס השתנה מאז שהקובץ הופק).`:''));
+  }catch(err){ alert('קובץ לא תקין'); }
+});
+
+/* ---------- טבלת פירוט דירות (Excel) ---------- */
+function floorMap(b){
+  const N=Math.max(0,Math.min(150,Math.round(num(b.floors,0)))), fl=[];
+  for(let f=0;f<=N;f++){ let g=null;
+    b.groups.forEach(gr=>{ if(g) return; const a=Math.round(num(gr.from,NaN)), z=Math.round(num(gr.to,NaN)); if(isFinite(a)&&isFinite(z)&&a<=f&&f<=z&&a>=0&&z<=N) g=gr; });
+    const apts=[]; if(g) g.types.forEach(t=>{ const c=Math.max(0,Math.round(num(t.count))); for(let k=0;k<c;k++) apts.push(t.conn||''); });
+    fl.push({f, apts}); }
+  let n=0; fl.forEach(x=>{ x.nums=x.apts.map(()=>++n); });
+  return {N, fl};
+}
+document.getElementById('bAptXlsx').addEventListener('click',async()=>{
+  if(!window.ExcelJS){ alert('ספריית האקסל לא נטענה – בדוק חיבור לאינטרנט'); return; }
+  if(!LAST) recalc(); const O=LAST.O;
+  const wb=new ExcelJS.Workbook(); wb.creator='Tiktin';
+  const ws=wb.addWorksheet('פירוט דירות',{views:[{rightToLeft:true,showGridLines:false}],pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0}});
+  ws.headerFooter.oddFooter='&Rטיקטין תכנון חשמל בע״מ&Lעמוד &P מתוך &N';
+  const thin={style:'thin',color:{argb:'FF9AA3AD'}}, B={top:thin,left:thin,bottom:thin,right:thin};
+  const fill=c=>({type:'pattern',pattern:'solid',fgColor:{argb:c}});
+  const CF={'3x25':'FFFFFFFF','3x40':'FFE3EEFA','3x63':'FFFDE7CC'}; const cf=c=>CF[c]||(c?'FFF8D7DA':'FFFFFFFF');
+  const A=(c,o={})=>Object.assign(c,{font:{name:'Arial',size:o.size||9,bold:!!o.bold,color:o.color?{argb:o.color}:undefined},alignment:{horizontal:o.h||'center',vertical:'middle',wrapText:true,readingOrder:'rtl'}});
+  const logoId=wb.addImage({base64:LOGO(),extension:'png'});
+  ws.addImage(logoId,{tl:{col:0.1,row:0.1},ext:{width:140,height:60}});
+  const blds=PROJ.list.map((b,i)=>({b,i,m:floorMap(b),R:O.calcs[i],o:O.orders.find(o=>o.bld===i)}));
+  const width=x=>1+Math.max(1,...x.m.fl.map(f=>f.apts.length));
+  const totalCols=blds.reduce((s,x)=>s+width(x)+1,0);
+  ws.getRow(1).height=24; ws.getRow(2).height=18; ws.getRow(3).height=14;
+  const tc=Math.min(Math.max(totalCols,6),30);
+  ws.mergeCells(1,3,1,Math.max(3,tc)); A(ws.getCell(1,3),{size:15,bold:true,h:'right'}).value=`טבלת פירוט דירות – ${PROJ.project.name||'פרויקט'}`;
+  ws.mergeCells(2,3,2,Math.max(3,tc)); A(ws.getCell(2,3),{size:9,h:'right',color:'FF5F6670'}).value=`${PROJ.project.client?'לקוח: '+PROJ.project.client+' · ':''}${PROJ.project.city||''} · הופק ${todayStr()} · ${APP_SHORT} ${VERSION}`;
+  // הבניינים בשורות של עד ~30 עמודות (בערך 4 בניינים בשורה), כמו בטבלה לדוגמה
+  const bands=[]; { let cur=[], cw=0; blds.forEach(x=>{ const w=width(x)+1; if(cur.length && cw+w>30){ bands.push(cur); cur=[]; cw=0; } cur.push(x); cw+=w; }); if(cur.length) bands.push(cur); }
+  let R0=5, endRow=5;
+  bands.forEach(band=>{
+  const maxN=Math.max(0,...band.map(x=>x.m.N));
+  let col=1, bandEnd=R0;
+  band.forEach(x=>{
+    const w=width(x), c0=col, cL=col+w-1, nm=bldName(x.b,x.i), on=x.o?ordNoOf(x.o):'';
+    ws.mergeCells(R0,c0,R0,cL); const t=A(ws.getCell(R0,c0),{size:11,bold:true,color:'FFFFFFFF'}); t.value=nm; t.fill=fill('FF1F2328'); t.border=B;
+    ws.mergeCells(R0+1,c0,R0+1,cL); const o=A(ws.getCell(R0+1,c0),{size:10,bold:true,color:on?'FFC8202F':'FF8A939C'}); o.value=on?`הזמנה ${on}`:'הזמנה: טרם נרשם מספר'; o.border=B;
+    const h1=A(ws.getCell(R0+2,c0),{bold:true}); h1.value='מס׳ קומה'; h1.fill=fill('FFF3F4F6'); h1.border=B;
+    if(w>1){ if(w>2) ws.mergeCells(R0+2,c0+1,R0+2,cL); const h2=A(ws.getCell(R0+2,c0+1),{bold:true}); h2.value='דירות – מספר דירה וגודל חיבור'; h2.fill=fill('FFF3F4F6'); h2.border=B; }
+    for(let f=maxN; f>=0; f--){ const r=R0+3+(maxN-f), fl=x.m.fl[f];
+      if(!fl) continue;
+      const fc=A(ws.getCell(r,c0),{bold:true}); fc.value=f===0?'קומת קרקע':f; fc.fill=fill('FFF3F4F6'); fc.border=B;
+      for(let k=0;k<w-1;k++){ const c=ws.getCell(r,c0+1+k); c.border=B;
+        if(k<fl.apts.length){ A(c).value=`דירה ${fl.nums[k]}\n${fl.apts[k]?CONN_LBL(fl.apts[k]):'—'}`; c.fill=fill(cf(fl.apts[k])); } }
+    }
+    let r=R0+3+maxN+2;
+    const sumRow=(lbl,val,bold)=>{ if(w>2) ws.mergeCells(r,c0,r,cL-1); const a=A(ws.getCell(r,c0),{h:'right',bold}); a.value=lbl; a.border=B; a.fill=fill('FFFAFBFC');
+      const v=A(ws.getCell(r,w>1?cL:c0+1),{bold:true,color:'FFC8202F'}); v.value=val; v.border=B; r++; };
+    sumRow('סה״כ דירות בבניין:', x.R.units, true);
+    Object.entries(x.R.byConn).sort((a,b)=>CONNS.indexOf(a[0])-CONNS.indexOf(b[0])).forEach(([c,n])=>sumRow(`סה״כ דירות ${CONN_LBL(c)}:`, n));
+    if(x.R.noConn) sumRow('דירות ללא גודל חיבור:', x.R.noConn);
+    sumRow('חיבור ציבורי בניין:', x.b.pub?CONN_LBL(x.b.pub):'—');
+    allX().filter(z=>xInb(z)&&bldIndexOf(z.loc)===x.i&&z.size).forEach(z=>sumRow(`${xDesc(z)}:`, `${Math.max(1,Math.round(num(z.qty,1)))} × ${CONN_LBL(z.size)}`));
+    for(let k=0;k<w;k++){ const cc=ws.getColumn(c0+k); cc.width=Math.max(cc.width||0, k===0?10:12); }
+    if(!ws.getColumn(cL+1).width) ws.getColumn(cL+1).width=3;
+    bandEnd=Math.max(bandEnd,r); col=cL+2;
+  });
+  for(let f=maxN; f>=0; f--) ws.getRow(R0+3+(maxN-f)).height=30;
+  endRow=bandEnd; R0=bandEnd+2;
+  });
+  // הזמנות נפרדות
+  const sep=O.orders.filter(o=>o.bld==null);
+  if(sep.length){
+    let r=endRow+2;
+    ws.mergeCells(r,1,r,4); A(ws.getCell(r,1),{size:11,bold:true,h:'right'}).value='חיבורים בהזמנות נפרדות'; r++;
+    ['סוג ההזמנה','מיועדת ל־','פירוט חיבורים','מספר הזמנה'].forEach((h,k)=>{ const c=A(ws.getCell(r,1+k),{bold:true,color:'FFFFFFFF'}); c.value=h; c.fill=fill('FF1F2328'); c.border=B; }); r++;
+    sep.forEach(o=>{ [o.kind,o.target,o.conns||'—',ordNoOf(o)||'טרם נרשם'].forEach((v,k)=>{ const c=A(ws.getCell(r,1+k),{bold:k===3,color:k===3&&ordNoOf(o)?'FFC8202F':undefined}); c.value=v; c.border=B; }); ws.getRow(r).height=28; r++; });
+    [12,14,16,14].forEach((wd,k)=>{ if((ws.getColumn(1+k).width||0)<wd) ws.getColumn(1+k).width=wd; });
+  }
+  const buf=await wb.xlsx.writeBuffer();
+  download(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), `טבלת פירוט דירות - ${PROJ.project.name||'פרויקט'}.xlsx`);
+});
+
+/* ---------- קליטה מאפליקציית הנחיות החשמל ---------- */
+const GL_LS='tiktin-arch-guidelines-v1';
+function glPub(gb){ const z=String(gb.pubSize||'').toLowerCase(); if(gb.cat==='low' && BIG.includes(z)) return z;
+  if(gb.cat==='mid') return '3x200'; if(gb.cat==='high') return '3x400'; const pf=num(gb.perFloor,0); return pf&&pf<=3?'3x40':'3x63'; }
+function glApply(G){
+  if(!G||!G.project||!Array.isArray(G.buildings)||!G.buildings.length) throw new Error('bad');
+  const P=PROJ.project, gp=G.project, notes=[];
+  if(gp.name) P.name=gp.name; if(gp.iso) P.num=String(gp.iso); if(gp.dev) P.client=gp.dev; if(gp.city) P.city=gp.city;
+  const names=G.buildings.map((gb,i)=>{ const n=String(gb.name||'').trim()||String(i+1); return /^בניין/.test(n)?n:'בניין '+n; });
+  PROJ.list=G.buildings.map((gb,i)=>{
+    const st=defaultBuilding(i), F=Math.round(num(gb.floors,0)), pf=Math.round(num(gb.perFloor,0)), U=Math.round(num(gb.units,0));
+    st.building=names[i]; st.floors=F?String(F):''; st.cat=['low','mid','high'].includes(gb.cat)?gb.cat:'';
+    st.meters=gb.meters==='floors'?'פיזור מונים':(gb.meters==='down'?'ריכוז מונים':''); st.pub=glPub(gb);
+    if(F&&pf){ const from=(U && U===(F+1)*pf)?0:1; st.groups=[{from:String(from),to:String(F),types:[{count:String(pf),rooms:'',area:'',conn:'3x25',auto:true}]}];
+      const got=(F-from+1)*pf; if(U && U!==got) notes.push(`${names[i]}: בהנחיות ${U} יח״ד, ובמקבץ שנוצר ${got} (${pf} דירות × ${F-from+1} קומות) – יש לעדכן את המקבצים או לקלוט את קובץ התמהיל`); }
+    else if(U) notes.push(`${names[i]}: חסרים מספר קומות או דירות בקומה – יש להזין את המקבצים`);
+    return st; });
+  PROJ.extras=[]; G.buildings.forEach((gb,i)=>{ if(!gb.com) return; (gb.comConns||[]).forEach(cc=>{ const z=String(cc.sz||'').toLowerCase(); if(!BIG.includes(z)&&!CONNS.includes(z)) return;
+    PROJ.extras.push(Object.assign(newExtra(),{type:'com',assign:'bld',loc:locShort(names[i]),size:z,qty:String(Math.max(1,Math.round(num(cc.n,1))))})); }); });
+  const gk=G.parking||{}; PROJ.park=newPark();
+  if(gk.has){ const z=String(gk.baseSize||'').toLowerCase(); if(BIG.includes(z)) PROJ.park.size=z; if(+gk.baseBld>=0 && names[+gk.baseBld]) PROJ.park.loc=locShort(names[+gk.baseBld]); }
+  PROJ.active=0; S=PROJ.list[0]; PROJ.ordNo={}; fullRender();
+  alert(`נקלטו מההנחיות: ${PROJ.list.length} בניינים${PROJ.extras.length?`, ${PROJ.extras.length} חיבורי מסחר`:''}${PROJ.park.size?', חניון':''}.\n\nבהנחיות אין תמהיל דירות מפורט – נוצר מקבץ אחד לכל בניין (דירות בקומה × קומות, חיבור 3X25A). לתמהיל המדויק – לקלוט גם את קובץ התמהיל (📥 קליטה מקובץ).`+(notes.length?'\n\nלבדיקה:\n• '+notes.join('\n• '):''));
+}
+document.getElementById('bGl').addEventListener('click',()=>{
+  let G=null; try{ G=JSON.parse(localStorage.getItem(GL_LS)||'null'); }catch(e){}
+  const has=G&&G.project&&Array.isArray(G.buildings)&&(G.project.name||G.buildings.some(b=>num(b.units,0)>0));
+  if(has && confirm(`נמצא טופס פתוח באפליקציית ההנחיות: "${G.project.name||'ללא שם'}" (${G.buildings.length} בניינים).\n\nאישור – קליטה ממנו (הבניינים בטופס הנוכחי יוחלפו).\nביטול – בחירת קובץ הנחיות שמור (JSON).`)){ try{ glApply(G); }catch(e){ alert('לא ניתן לקלוט את טופס ההנחיות'); } return; }
+  document.getElementById('fGl').click();
+});
+document.getElementById('fGl').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  try{ const o=JSON.parse(await f.text()); const G=o.state||o; if(!confirm('הבניינים בטופס הנוכחי יוחלפו בנתוני ההנחיות. להמשיך?')) return; glApply(G); }
+  catch(err){ alert('הקובץ אינו קובץ הנחיות שמור.\nבאפליקציית ההנחיות: "שמירת טופס" ← "שמירה למחשב" יוצר קובץ JSON שאפשר לקלוט כאן.'); }
+});
+
+/* ---------- שמירת Word + PDF לתיקיית הפרויקט (כונן T) ---------- */
+const IDB=(()=>{ const op=()=>new Promise((res,rej)=>{ const r=indexedDB.open('tiktin-iec-orders',1); r.onupgradeneeded=()=>r.result.createObjectStore('h'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
+  return { get:async k=>{ const db=await op(); return new Promise(res=>{ const q=db.transaction('h').objectStore('h').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>res(null); }); },
+           set:async (k,v)=>{ const db=await op(); return new Promise(res=>{ const t=db.transaction('h','readwrite'); t.objectStore('h').put(v,k); t.oncomplete=()=>res(true); t.onerror=()=>res(false); }); } }; })();
+async function canWrite(h){ try{ if(!h) return false; if(await h.queryPermission({mode:'readwrite'})==='granted') return true; return await h.requestPermission({mode:'readwrite'})==='granted'; }catch(e){ return false; } }
+async function findDir(root, re, depth){
+  const lvl=[root]; for(let d=0; d<depth; d++){ const next=[]; let seen=0;
+    for(const dir of lvl){ for await (const [name,h] of dir.entries()){ if(h.kind!=='directory') continue; if(re.test(name)) return h; if(++seen<4000) next.push(h); } }
+    lvl.splice(0,lvl.length,...next); if(!lvl.length) break; }
+  return null;
+}
+document.getElementById('bToT').addEventListener('click',async ev=>{
+  if(!window.showDirectoryPicker){ alert('שמירה ישירה לתיקייה עובדת בדפדפן Chrome או Edge במחשב. בדפדפן הזה – להשתמש בכפתורי הייצוא.'); return; }
+  const btn=document.getElementById('bToT'), old=btn.textContent;
+  try{
+    const P=PROJ.project, numP=String(P.num||'').trim(), mapKey='proj:'+(numP||P.name||'');
+    let dir=await IDB.get(mapKey); if(dir && !(await canWrite(dir))) dir=null;
+    let root=ev.shiftKey?null:await IDB.get('root'); if(root && !(await canWrite(root))) root=null;
+    if(!dir){
+      if(!root){ alert('בפעם הראשונה: בחר את התיקייה הראשית של הפרויקטים בכונן T.\nהטופס יזכור אותה, ובכל פעם ימצא לבד את תיקיית הפרויקט לפי מספר הפרויקט.');
+        root=await showDirectoryPicker({id:'tiktin-T-root',mode:'readwrite'}); await IDB.set('root',root); }
+      btn.textContent='מחפש תיקייה…'; btn.disabled=true;
+      if(numP){ const re=new RegExp('(^|\\D)'+numP.replace(/\D/g,'')+'(\\D|$)'); const pd=numP.replace(/\D/g,'')?await findDir(root,re,2):null;
+        if(pd){ dir=await findDir(pd,/חברת.?ה?חשמל|חח["״׳']?י|iec/i,2)||pd; } }
+      btn.textContent=old; btn.disabled=false;
+      if(!dir){ alert(numP?`לא נמצאה בתיקייה "${root.name}" תיקייה עם מספר הפרויקט ${numP}.\nבחר את התיקייה לשמירה.`:'לא הוזן מספר פרויקט – בחר את התיקייה לשמירה.');
+        dir=await showDirectoryPicker({id:'tiktin-iec-proj',mode:'readwrite',startIn:root}); }
+      await IDB.set(mapKey,dir);
+    }
+    btn.textContent='מכין קבצים…'; btn.disabled=true;
+    DL_SINK=[]; try{ await exportDoc(); await exportPdf(); } finally { var files=DL_SINK; DL_SINK=null; }
+    const d=todayStr().replace(/\//g,'.');
+    for(const f of files){ const nm=f.name.replace(/(\.[a-z]+)$/i,` - ${d}$1`); const fh=await dir.getFileHandle(nm,{create:true}); const w=await fh.createWritable(); await w.write(f.blob); await w.close(); f.saved=nm; }
+    alert(`נשמר בתיקייה "${dir.name}":\n${files.map(f=>'• '+f.saved).join('\n')}`);
+  }catch(err){ if(err&&err.name==='AbortError') return; alert('השמירה לתיקייה לא הצליחה'+(err&&err.message?`: ${err.message}`:'')); }
+  finally{ btn.textContent=old; btn.disabled=false; }
+});
 
 /* ---- import dialog ---- */
 function importDialog(blds, fileName){
