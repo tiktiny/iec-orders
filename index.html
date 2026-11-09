@@ -305,7 +305,7 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
       <label class="f"><span class="lbl">שם בניין / כניסה</span><span class="fld"><input id="building" type="text" title="כך יופיע הבניין בכתובת החיבור, למשל בניין A"></span></label>
       <label class="f"><span class="lbl">מספר קומות מעל קומת קרקע</span><span class="fld"><input id="floors" type="text" inputmode="numeric" title="הקומה העליונה. קומת קרקע = 0"></span></label>
       <label class="f"><span class="lbl">גובה רצפת קומת המגורים האחרונה [מ׳]</span><span class="fld"><input id="height" type="text" inputmode="decimal" title="הגובה הקובע: מרצפת קומת הכניסה (קרקע) עד רצפת קומת המגורים האחרונה. אם ריק – מוערך לפי מספר הקומות (כ-2.9 מ׳ לקומה)"></span></label>
-      <label class="f"><span class="lbl">מיקום מונים</span><span class="fld"><select id="meters" data-def="" title="ריכוז מונים בחדר מונים או פיזור מונים בקומות – נבחר במפורש בהזמנה באתר"><option value="">— אוטומטי לפי כמות דירות —</option><option value="ריכוז מונים">ריכוז מונים</option><option value="פיזור מונים">פיזור מונים</option></select></span></label>
+      <label class="f"><span class="lbl">מיקום מונים</span><span class="fld"><select id="meters" data-def="" title="שדה חובה: ריכוז מונים בחדר מונים או פיזור מונים בקומות – נכתב בתחילת הערות ההזמנה באתר"><option value="">— בחירה (חובה) —</option><option value="ריכוז מונים">ריכוז מונים</option><option value="פיזור מונים">פיזור מונים</option></select></span></label>
       <label class="f"><span class="lbl">חיבור ציבורי לבניין</span><span class="fld"><select id="pub" data-def="" title="גודל החיבור הציבורי של הבניין"></select></span></label>
     </div>
     <div class="grid g5" style="margin-top:10px">
@@ -406,7 +406,7 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V7';
+const VERSION = 'V8';
 const VDATE = '09.11.2026';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
@@ -656,8 +656,8 @@ function compute(b){
     units+=c; kva+=c*demand(t.rooms,t.conn).p;
     if(t.conn) byConn[t.conn]=(byConn[t.conn]||0)+c; else noConn+=c;
     const rk=t.rooms?ROOM_LBL[t.rooms]+' חד׳':'ללא חדרים'; byRooms[rk]=(byRooms[rk]||0)+c; }); });
-  const meters = b.meters || (units>100 ? 'פיזור מונים' : 'ריכוז מונים');
-  return {N, gErr, units, kva, byConn, byRooms, noConn, meters, metersAuto:!b.meters};
+  const meters = b.meters || '';
+  return {N, gErr, units, kva, byConn, byRooms, noConn, meters, metersAuto:false};
 }
 const connStr = bc => CONNS.filter(c=>bc[c]).map(c=>`${bc[c]} × ${c.toUpperCase()}`).join('; ');
 
@@ -841,20 +841,23 @@ function buildOrders(){
     if(b.pub) parts.push(`ציבורי: 1 × ${b.pub.toUpperCase()}`);
     inc.forEach(x=>parts.push(`${xDesc(x)}: ${Math.max(1,Math.round(num(x.qty,1)))} × ${x.size.toUpperCase()}`));
     const total=R.units+(b.pub?1:0)+inc.reduce((s,x)=>s+Math.max(1,Math.round(num(x.qty,1))),0);
-    let note=`פרויקט ${P.name||''}; ${nm}; ${R.units} דירות; ${R.meters}`+(b.pub?`; ציבורי ${SZ(b.pub)}`:'')+inc.map(x=>`; ${xDesc(x)} ${SZ(x.size)} (שיוך: ${xShiyuch(x)})`).join('');
+    const noteHead=R.meters||'מיקום מונים לא נבחר';
+    const noteTail=`${nm}; ${R.units} דירות`+(b.pub?`; ציבורי ${SZ(b.pub)}`:'')+inc.map(x=>`; ${xDesc(x)} ${SZ(x.size)} (שיוך: ${xShiyuch(x)})`).join('')+`; פרויקט ${P.name||''}`;
+    let note=noteHead+'; '+noteTail;
     const items=CONNS.filter(c=>R.byConn[c]).map(c=>({what:'דירות', size:c.toUpperCase(), qty:R.byConn[c]}));
     Object.keys(R.byConn).filter(c=>!CONNS.includes(c)).forEach(c=>items.push({what:'דירות', size:c.toUpperCase(), qty:R.byConn[c]}));
     if(b.pub) items.push({what:'ציבורי', size:b.pub.toUpperCase(), qty:1});
     inc.forEach(x=>items.push({what:xDesc(x), size:x.size.toUpperCase(), qty:Math.max(1,Math.round(num(x.qty,1)))}));
-    out.push({kind:'קבועה – מגורים', type:'res', target:nm, addr:'הזמנה ל'+nm+tail, meters:R.meters, conns:parts.join('; '), total, note, bld:i, units:R.units, items});
+    out.push({kind:'קבועה – מגורים', type:'res', target:nm, addr:'הזמנה ל'+nm+tail, meters:R.meters||'—', conns:parts.join('; '), total, note, noteHead, noteTail, bld:i, units:R.units, items});
   });
   [...PROJ.extras.filter(x=>!xInb(x)), ...parkItems().filter(x=>!xInb(x)&&x.size)].forEach(x=>{
     const q=Math.max(1,Math.round(num(x.qty,1))), d=xDesc(x);
     out.push({kind:'קבועה – חיבור נפרד', type:'sep', target:d, addr:'הזמנה ל'+d+tail, meters:'—', conns:x.size?`${q} × ${x.size.toUpperCase()}`:'', total:q, items:x.size?[{what:typeLbl(x), size:x.size.toUpperCase(), qty:q}]:[], xtLbl:typeLbl(x),
-      note:`פרויקט ${P.name||''}; ${typeLbl(x)}; מיקום: ${xLocTxt(x)}; שיוך: ${xShiyuch(x)}`+(x.note?'; '+x.note:''), xt:x.type});
+      noteHead:'', noteTail:`${typeLbl(x)}; מיקום: ${xLocTxt(x)}; שיוך: ${xShiyuch(x)}`+(x.note?'; '+x.note:'')+`; פרויקט ${P.name||''}`, xt:x.type});
+    out[out.length-1].note=out[out.length-1].noteTail;
   });
   const nPerm=out.length;
-  out.forEach((o,i)=>{ if(i>0) o.note+='; הזמנות קודמות בפרויקט: ימולאו בעת הפתיחה'; });
+  out.forEach((o,i)=>{ if(i>0 && o.perm!==false){ o.note=[o.noteHead,'הזמנות קודמות: ימולאו בעת הפתיחה',o.noteTail].filter(Boolean).join('; '); } });
   if(PROJ.temp.size){
     const li=Math.min(+PROJ.temp.link||0,PROJ.list.length-1), ln=bldName(PROJ.list[li],li);
     const link=`הזמנה קבועה של ${ln} (מס׳ ${li+1} ברשימה)`;
@@ -877,6 +880,7 @@ function issues(O){
     if(R.noConn) out.push(`${nm}: ${R.noConn} דירות ללא גודל חיבור`);
     R.gErr.forEach((g,gi)=>{ if(g&&g.err) out.push(`${nm}: מקבץ ${gi+1} – ${g.err}`); });
     if(!b.pub) out.push(`${nm}: לא נבחר חיבור ציבורי`);
+    if(!b.meters) out.push(`${nm}: לא נבחר מיקום מונים (ריכוז / פיזור) – שדה חובה`);
   });
   const names=PROJ.list.map(bldName); names.forEach((n,i)=>{ if(names.indexOf(n)!==i) out.push(`שם בניין כפול: ${n}`); });
   PROJ.extras.forEach((x,i)=>{ const d=xDesc(x), k=isPark(x)?'חיבור חניון':'חיבור';
@@ -911,7 +915,7 @@ function sections(O, iss){
   secs.push({title:'בניינים ודירות', head:['בניין','קומות','דירות','מיקום מונים','3X25','3X40','3X63','3X80','3X100','אחר','חיבור ציבורי'],
     rows:PROJ.list.map((b,i)=>{ const R=O.calcs[i]; const other=Object.entries(R.byConn).filter(([c])=>!['3x25','3x40','3x63','3x80','3x100'].includes(c)).map(([c,n])=>`${n}×${c.toUpperCase()}`).join(' ');
       return [bldName(b,i), R.N, R.units, R.meters, R.byConn['3x25']||'', R.byConn['3x40']||'', R.byConn['3x63']||'', R.byConn['3x80']||'', R.byConn['3x100']||'', other, b.pub?b.pub.toUpperCase():'–']; }),
-    note:'מיקום מונים אוטומטי לפי כלל המשרד: עד 100 דירות – ריכוז מונים, מעל 100 – פיזור מונים בקומות.'});
+    note:'מיקום המונים (ריכוז / פיזור) נבחר בטופס לכל בניין – שדה חובה – ונכתב בתחילת הערות ההזמנה באתר.'});
   const repX=[...parkItems().filter(x=>x.size), ...PROJ.extras];
   if(repX.length) secs.push({title:'חניון, מסחר, משרדים ומבני ציבור', head:['סוג','מיקום','שיוך החיבור','תיאור','גודל','כמות','אופן פתיחה','הערות'],
     rows:repX.map(x=>[typeLbl(x), xLocTxt(x), xShiyuch(x), xDesc(x), x.size?x.size.toUpperCase():'–', Math.max(1,Math.round(num(x.qty,1))), xInb(x)?'בהזמנת הבניין':'הזמנה נפרדת', x.note||'–']), wide:3});
@@ -919,7 +923,7 @@ function sections(O, iss){
   const hasRes=RES.some(r=>r.number||r.status!=='ממתין');
   secs.push({title:'רשימת ההזמנות לפתיחה – לפי הסדר', head:['#','סוג ההזמנה','מיועדת ל־','כתובת החיבור (תיאור)','תווים','מיקום מונים','פירוט חיבורים','הערות להזמנה',...(hasRes?['מספר הזמנה']:[])],
     rows:ord.map(o=>{ const r=resOf(o); return [o.seq,o.kind,o.target,o.addr,o.len>100?o.len+' ⚠':o.len,o.meters,o.conns||'–',o.note,...(hasRes?[r?(r.number||r.status):'–']:[])]; }), wide:3, small:true,
-    note:'סדר הפתיחה: קודם כל ההזמנות הקבועות (בניין אחרי בניין, ואחריהם החיבורים הנפרדים) – ורק אחר כך שלוש ההזמנות של החיבור הזמני.\nמההזמנה השנייה ואילך – בהערות ההזמנה רושמים את מספרי כל ההזמנות הקודמות בפרויקט.\nכתובת החיבור: בוחרים יישוב, משאירים רחוב ומספר ריקים וכותבים את התיאור כפי שמופיע כאן. אם האתר דוחה את האורך – עוצרים והמתכנן מחליט מה להשמיט.'});
+    note:'סדר הפתיחה: קודם כל ההזמנות הקבועות (בניין אחרי בניין, ואחריהם החיבורים הנפרדים) – ורק אחר כך שלוש ההזמנות של החיבור הזמני.\nהערות ההזמנה באתר מוגבלות ל־100 תווים ונשמרת רק תחילת הטקסט – לכן הסדר קבוע: מיקום המונים, מספרי ההזמנות הקודמות בפרויקט, ואחריהם שאר הפרטים.\nכתובת החיבור: בוחרים יישוב, משאירים רחוב ומספר ריקים וכותבים את התיאור כפי שמופיע כאן. אם האתר דוחה את האורך – עוצרים והמתכנן מחליט מה להשמיט.'});
   secs.push({title:'חיבור זמני לאתר בנייה', kv: PROJ.temp.size ? [['גודל חיבור זמני',SZ(PROJ.temp.size)],['הזמנה קבועה מקושרת',bldName(PROJ.list[+PROJ.temp.link||0]||{},+PROJ.temp.link||0)],['הזמנות שייפתחו','חיבור זמני · עע״א · פירוק חיבור זמני'],['תכנית מדידה',PROJ.docs.survey.got==='כן'?'התקבלה – '+(PROJ.docs.survey.file||''):'חסרה']] : [['חיבור זמני','אין']]});
   secs.push({title:'הצהרות ואופן השליחה', kv:[
     ...DECL.map(([k,l])=>[l,PROJ.decl[k]?'חיובי – לאשר באתר':'שלילי – לא לאשר']),
@@ -938,7 +942,8 @@ function recalc(){
   S.groups.forEach((g,gi)=>g.types.forEach((t,ti)=>{ const el=document.getElementById(`sub${gi}_${ti}`); if(el){ const d=demand(t.rooms,t.conn); el.innerHTML = d.p? `<span title="שיא ביקוש לדירה לפי חח״י${d.subst?' – צירוף לא קיים בטבלה, נלקח מהשורה הקרובה':''}">(${fmt(d.p)} kVA${d.subst?' ✱':''})</span>` : ''; } }));
   document.getElementById('bldTitle').textContent = bldName(S,PROJ.active);
   document.getElementById('unitsTotal').textContent = R.units;
-  document.getElementById('metersEff').textContent = R.meters + (R.metersAuto?' (אוטומטי)':'');
+  document.getElementById('metersEff').textContent = R.meters || 'לא נבחר – חובה';
+  document.getElementById('metersEff').classList.toggle('bad', !R.meters);
   drawCat();
   document.getElementById('connsTotal').textContent = connStr(R.byConn) || '—';
   document.getElementById('totals').innerHTML = `סה״כ ${R.units} דירות · ${connStr(R.byConn)||'אין חיבורים'}${R.kva?` · Σ שיא ביקוש ${fmt(R.kva)} kVA`:''}`;
