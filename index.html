@@ -6,10 +6,8 @@
 <meta name="color-scheme" content="light only">
 <title>פתיחת הזמנות חברת חשמל – משרד טיקטין</title>
 <script data-goatcounter="https://tiktin-apps.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <style>
 :root{
   --red:#c8202f; --orange:#f07a24; --ink:#1f2328; --muted:#5f6670; --line:#d5d9de;
@@ -19,20 +17,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif;font-size:15px}
-header{background:#fff;border-bottom:3px solid var(--red);display:flex;align-items:center;gap:16px;padding:10px 16px;position:sticky;top:0;z-index:20}
-header img{height:52px}
-header h1{font-size:20px;margin:0;flex:1}
-header .ver{color:var(--muted);font-size:13px;white-space:nowrap}
 
-/* גודל טופס – משנה רק את הטופס, לא את הדפדפן */
-main,.toolbar,.imphelp,footer{zoom:var(--fz,1)}
-header .fz{display:flex;align-items:center;gap:4px;white-space:nowrap}
-header .fz .lbl{color:var(--muted);font-size:13px;margin-left:4px}
-header .fz .btn{height:32px;padding:0 10px;font-size:14px}
-header .fz .fzb{width:32px;justify-content:center;padding:0;font-size:18px;color:var(--red)}
-header .fz .fzv{min-width:58px;justify-content:center}
-@media (max-width:560px){header .fz .lbl{display:none}}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line)}
 .btn{height:var(--h);padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:8px;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--ink)}
 .btn:hover{border-color:var(--red)}
 .tgrp{display:flex;flex-wrap:wrap;gap:8px}
@@ -129,10 +114,9 @@ th{background:#f1f3f5;font-weight:600}
 .dbox h2{margin:0 0 10px;font-size:18px}
 .rp td,.rp th{border:none;padding:0;text-align:right}
 footer{color:var(--muted);font-size:12px;text-align:center;padding:10px 0 20px}
-@media print{header,.toolbar{position:static}.toolbar,.x,.del,.btn{display:none !important}}
 /* ---- פתיחת הזמנות: פריסה ברוחב מלא, הפלט מתחת לקלט ---- */
 main{grid-template-columns:minmax(0,1fr) !important}
-#projGrid{grid-template-columns:repeat(6,minmax(0,1fr))}
+#projGrid{grid-template-columns:repeat(7,minmax(0,1fr))}
 @media (max-width:1100px){#projGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:560px){#projGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 #groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:0 12px}
@@ -153,7 +137,6 @@ main{grid-template-columns:minmax(0,1fr) !important}
 .report{overflow-x:auto;background:#fff}
 .report table{font-size:inherit}
 .report td,.report th{border:none;padding:0}
-@media (max-width:560px){header img{height:40px}header h1{font-size:16px}}
 @media (min-width:701px){.drow + .drow .lbl{display:none}.drow + .drow{margin-top:-2px}}
 @media (min-width:1101px){.xrow + .xrow .lbl{display:none}}
 @media (max-width:560px){header{flex-wrap:wrap;gap:6px 10px}header h1{flex:1 1 55%}header .fz{order:3}header .ver{order:4}}
@@ -213,55 +196,165 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
 .goitem small{color:var(--muted)}
 .gonote{font-size:12px;color:var(--muted);padding:6px 10px 4px;border-top:1px solid var(--line);margin-top:2px}
 
-.btn.iecgo{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:600}
-.btn.iecgo:disabled{background:#f3d3bb;border-color:#f3d3bb;color:#fff;cursor:not-allowed}
 .btn.pick.has{background:#eef8f1;border-color:#9fd3b0}
 .iecbar{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .status .iecst{display:block;margin-top:6px;font-weight:400}
 #extDlg .dbox{max-width:560px}
 #extDlg ol{padding-inline-start:20px;line-height:1.7;margin:6px 0}
+/* ===== ממשק אחיד טיקטין: כותרת + סרגל כפתורים בשורה אחת ===== */
+html,body{font-family:"Rubik","Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+.tktop{position:sticky;top:0;z-index:20;background:#fff}
+header{background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 16px;min-height:52px}
+header img{height:36px}
+header h1{font-size:18px;font-weight:600;margin:0;flex:1;min-width:0}
+header .ver{color:var(--muted);font-size:13px;white-space:nowrap}
+main,.imphelp,footer{zoom:var(--fz,1)}
+.fz{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;flex:none}
+.fz button{border:0;border-inline-start:1px solid var(--line);background:#fff;height:32px;min-width:34px;padding:0 10px;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;white-space:nowrap}
+.fz button:first-child{border-inline-start:0}
+.fz button:hover{background:var(--bg)}
+.fz .keep{color:var(--red);font-weight:500}
+.ribbon{background:#fff;border-bottom:2px solid var(--red);display:flex;align-items:stretch;padding:6px 4px;flex-wrap:nowrap}
+.rg{display:flex;align-items:stretch;gap:0;padding:0 2px;border-inline-start:1px solid var(--line);flex:none}
+.rg:first-child{border-inline-start:0;padding-inline-start:0}
+.rg.end{margin-inline-start:auto}
+.rb{flex:none;border:1px solid transparent;background:transparent;border-radius:8px;font:inherit;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;padding:6px 3px;min-width:50px;max-width:92px;height:70px;font-size:12.5px;line-height:1.2;text-align:center;text-decoration:none}
+.rb svg{width:24px;height:24px;flex:none;stroke:var(--red);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.rb:hover{background:var(--bg);border-color:var(--line)}
+.rb:focus-visible,.fz button:focus-visible{outline:2px solid var(--red);outline-offset:1px}
+.rb:disabled{opacity:.45;cursor:not-allowed}
+.rb.main{background:var(--red);color:#fff}
+.rb.main svg{stroke:#fff}
+.rb.main:hover{background:#a31724;border-color:#a31724}
+.rb.go{background:#fff4e8;border-color:var(--orange)}
+.rb.go svg{stroke:#c45a00}
+.rb.go:hover{background:#ffe9d2}
+.rb[hidden]{display:none}
+.rb.wide{max-width:112px}
+.rb.nar{max-width:60px}
+.rwrap{position:relative;display:flex}
+.rwrap[hidden]{display:none}
+.tkmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:70;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:6px;min-width:250px;max-width:min(420px,92vw);display:flex;flex-direction:column;gap:2px;text-align:right}
+.tkmenu[hidden]{display:none}
+.tkmenu .rb{flex-direction:row;height:40px;max-width:none;width:100%;justify-content:flex-start;gap:10px;padding:0 10px;font-size:14.5px;text-align:right}
+.tkmenu .rb.main,.tkmenu .rb.main:hover{background:transparent;color:var(--ink);border-color:transparent}.tkmenu .rb.main svg{stroke:var(--red)}
+.tkmenu .rb:hover{background:#fdecee;border-color:transparent}
+.tkmenu .mi b{font-weight:600}
+.tkmenu .mi{border:0;background:#fff;border-radius:7px;padding:9px 10px;font:inherit;cursor:pointer;color:var(--ink);text-align:right}
+.tkmenu .mi:hover{background:#fdecee;color:var(--red)}
+.tkmenu .mi small{color:var(--muted);display:block}
+.tkmenu .mt{font-weight:600;padding:6px 10px 4px}
+.tkmenu .mn{font-size:13px;color:var(--muted);padding:4px 10px 6px;line-height:1.5}
+.tkmenu ul{margin:0;padding:2px 28px 6px 10px;line-height:1.6;font-size:14px}
+#tkToast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#1f2328;color:#fff;padding:10px 18px;border-radius:10px;font-size:14.5px;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:90vw}
+#tkToast[hidden]{display:none}
+.tkmiss{outline:2px solid var(--red);outline-offset:1px;border-radius:8px}
+@media (max-width:700px){
+  .tktop{position:static}
+  header{flex-wrap:wrap;padding:8px 12px;gap:8px 12px}
+  header img{height:32px}
+  header h1{font-size:16px;flex-basis:60%}
+  .fz{width:100%;display:grid;grid-template-columns:repeat(6,1fr)}.fz button{grid-column:span 2;padding:0 4px;font-size:13px}
+  .fz #fzFit,.fz #fzKeep{grid-column:span 3;border-top:1px solid var(--line)}.fz #fzFit{border-inline-start:0}
+  .rwrap:empty{display:none}
+  .ribbon{flex-wrap:wrap;padding:6px;gap:4px 0}
+  .rg{display:contents}
+  .rb{flex:0 0 25%;max-width:25%;min-width:0;height:auto;min-height:66px;font-size:12.5px}
+  .rwrap{flex:0 0 25%;max-width:25%}.rwrap>.rb{flex:1 1 auto;max-width:none}
+  .tkmenu .rb{flex:none;max-width:none;min-height:0}
+}
+@media print{.tktop{position:static}.ribbon,.fz,#tkToast,.x,.del,.btn{display:none !important}}
+body.tkprint #inputs,body.tkprint #results>.card~.card,body.tkprint footer{display:none !important}
+@media (min-width:1101px){#projGrid label:has([data-p="gush"]){grid-column:span 2}}
+@media print{#inputs,#results>.card~.card,footer{display:none !important}}
 </style>
 
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-import" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h7"/></symbol>
+<symbol id="i-save" viewBox="0 0 24 24"><path d="M5 4h12l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6"/></symbol>
+<symbol id="i-open" viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3zM3 11h18"/></symbol>
+<symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v5h5"/></symbol>
+<symbol id="i-next" viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="13" width="7" height="7" rx="1.5"/><path d="M10 7.5h4.5v5.5M12.5 11l2 2 2-2"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 5 13h6l-1 9 8-11h-6z"/></symbol>
+<symbol id="i-xls" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16M15 4v16"/></symbol>
+<symbol id="i-word" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM15 3v4h4M9 11h7M9 14h7M9 17h4"/></symbol>
+<symbol id="i-pdf" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM15 3v4h4M9 17v-5h1.5a1.5 1.5 0 0 1 0 3H9M14 17v-5h2.5M14 14.5h2"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3zM12 12v5M9.5 14.5 12 17l2.5-2.5"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+<symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5M20 9H10a6 6 0 0 0 0 12h3"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7M6 10v10h12V10M10 20v-6h4v6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8M20 12v7H4V5h11"/></symbol>
+<symbol id="i-sample" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM15 3v4h4M12 11v6M9 14h6"/></symbol>
+<symbol id="i-print" viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7z"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><path d="M3 6h18v13H3zM3 7l9 7 9-7"/></symbol>
+<symbol id="i-dup" viewBox="0 0 24 24"><path d="M8 8h12v12H8zM4 16V4h12"/></symbol>
+<symbol id="i-recent" viewBox="0 0 24 24"><path d="M12 7v5l3 2M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></symbol>
+<symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></symbol>
+<symbol id="i-export" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M4 20h16"/></symbol>
+</defs></svg>
+<div class="tktop">
 <header>
   <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQMAAABwCAMAAAAtzuUiAAAAYFBMVEX//////v///P///v7//vn+///+/v79/v/+/f/9/vz7/v/7/vv4//3z//3/+v//+Pf49/f17Onm0Mrwm1mxo6L2giOfhHz1ayfebEzcQTrRKzDEHC1rV1lTLjK0GSs4FBiVYpxMAAAb4UlEQVR42u2di5rjJtOtdcRCyDq12mO7D7n/u/zXqgIJ2ZLt6WSy9/PkI5mJdULwUhRVUCjJ59d/PiVff/3nU/LX1+m/nb7A4LPfT4NP/fN7erltiNL2nf6X/kfPyQ89Xj325MW7pdkvZXhNnE5gcErmVJbJn015/tMn/6mSpWl6c0YYGFzhW+q6aepSUjhR+2OeybK2zZBF2mamjlLVpqhbjktlgwyWVFY+tW1bVcjDFEg5806RGx5I0hzXQq48gYxyHGQ8XdUoDi60yPjIn7gDZSo36hEq2ErC9RJlqeNL5lBaW1Zy3ViUg3+YAgO8uCy13KXUGo8c8LOp5zqVWq40NfhxaJrjEf9KqtsMz7MqNY6aKOmTy+9S3k1azKRNjTGegZFq43xZkoG8qkV2Tclq5cy4TngHm4kMdpIyyNIcr8XDkRhFxagbFyXPILeGBEqWCU/XyIyH+aEmBSbHX9oiyOdQLvU8NgfIhZQ6dyh0JAfRTeGCtSaHBCCzPMsNK1RVWcU7gSYvfQXz3FhbC1E2fm4aTyMTBuWuHCQqcyBpm7UclHVUFhaGJRcoyoCNI3XOrbW5RWVZ1dpA9CrpIA3KTqx4t8/C+gSONsU7D2yBFKVWYfNJ7pCbGmdLylVDgUorZmaZp7Jhnnw1fpB/zkf8i3B4sFrWLDBIsz0ECXOgINfIwcYqJK3aynaFqxsV3dY3Ua0MPsHAoVomT9AWOX5mGci7nO2eVI435kVzrP1LWGCKtCaUV/QIBdU2zkjfziSxQUOyOaomr0V/LlG7JLel1lPFBBLIzJsK96Fnhlv5EM4CUCLF4avaXQTCgH2Z6Is8us+gcTp2f4FwoET7RokZONd2TK4HJbSUP2zbAzpJXvjLVoqNIhVdj386yI0T5QAI+OmKbjO1qCHvlLYtUVInp/WYjxch86aSzP1jACL32DZLQld0KmC7CZfbordFF7MCb3kl69oXIbFAgQGkrbT9MDL1rmlb9Gynh0PbQpKQoz/spZj+iCeGTtqzqbIc4jGfv01DR2y+M7qQOdi3kE/X+8yRE1gP0VMJioJzbVsaqikgsO3uS6LngNGuBcR197f1fVOKPmDPrE07TKfT+XwaLKjbY9NPPDqNMtTYvBtxeD6NnYWYDCPvvVx4Zhr7kgoGXdcmw3TeTrht6GzPSkL+ijk30RuV1cNpoCx3I998Qe4nPlUcRWrakuoIb6rSXu7eeQ//oNRg0JtYJzZA8HabpqHrVCda6oCqHU5f39/fn2MJuXbHejh9y6EwyPNu4uH3NLDQ4/k7pI/LaRxyKg3clQzLhdt0nkb2NFGxRcit89pzlEPwR18dpvVThTKolYFL0376fpA+PlDqyULkq1hTUETPF6JF+qXp8kbx9PYBxiqUQyr9PdqmQl9wgz/sqD4iBsVc5A8mcgLOngrfPmKAKqJ1CppXtmA9P8iACgeKZpRDymCd+HJI1vpG6CIYTNCQKOgzBlKm00jdtDJQi2J8u/zCPwuCX5fzzKBKoKekcfH4ZSzAoBYGH8pAbIfOlxolqvPRv0/fiGc652gCPWDAvM7ILEtoL4IBnwQ8SBAU6Xjlu89DYatk/Fy1KW6yvYoPFTlUXq9F2SMg+RYOQ82KAcXg1zqBQeftxCqpoQ6UwcfC4Cz1G7uM718YQEfV4+X7+3q9ShH513loe2Vw2qu/3HcaxDC2M4OOGu/oCmVwUiFjHtfr3KgokTsGK8sz+HiUvq+oGrVr5KDkIga3DN6GwutEUzYxA1pKrikHEQswoPkWMWBpoD4nprezrxxU5YHCCn2maa17zmepj0gV9ItzIbc7BlYUrqbzRR8S7kexr2CBdA8ZgB7kidQgX+idBSqTwth2w9v51waDxNuJRoy3ZPB9gX3H1SX7AksNJwf4ZwYdh4AiuMfj9OkFIYGtBJOmG7bSOE6XIAhdWx2Pc24yrro89AVxaro585NAQJXwUnSaMqVZnT5k8HEV8ULfhO1LJ43KpG36DTEgg7z14wI9hHJh0OLBSsSaDGDhpaVTBsy+pFE9e7NeuZ2phITkjcdL/yuBbTvo4xeODXXEgLWq83y8eAYrF7lXwtex4ODdNAcasI15zECqIM5N3cwMIAa/fm0xsBEDU5cxg8LMDIrynkEB5w4P0RBj6akV+TLeWfqaiwMopi19CclO5LoTA2zNwGwzSJeHoJZpxyGj5mie6ANmQ7MVHn5JV0is5HGHQbHPIJKDTQZwFzhxkFmrI8HVMyh1xoHuqSUDHjub4b651lnr+uYlBi0G5I/AoJwZ2IcMrry9hlpv2U4w3rO2dh1st3+eQSYMKufNiA+IKxw18TfLUlzrWiYlIA7WVrgvVxNg6hMIQv0Sg7wFA73N2lcZsAbolnTl8wxqpKIy6MYtBL9+/X0GhqZUHxgUgYExh1ps55zeG3wlx9FdVD+rAwb2NQYQnvFDzUnbvsjgytFFGGTWpMKgOvZbg8JTBs/0gTDI2h7W/cygsNIXxLuvqQYMJBEObHWASgeDMBJ0LzLIOYR+eMPMHl7TB2CAgbHBUI+355z4OdBTOF9eYWDXDF6RA0jZsenCbeSGGnFCKWUbmoyudJFVFf3WmgVHXx3zGm5t+RoDOzOgzfJaX5CRtIEahinhyqo6NMdiTwweM3DmJX3gAgORg5wMOh3dO6hjlKIoZMam702wxCEirzKwZREYJMa8wuCqxsGRI6NBR805KdnsaQNhUO3rA/sCg5Qv6CMGaVrZFm4xfNdeWwII4INCGv3jpwG9JY/6QkIG2Q6DOjDok/KpPrgqgyv9TBQNykimHeoHYkAGdl8fPO4LFgzKMrtnkBWZDBSnIQkMUtcDAUd6aSQM3bDE13Kww8A1gUGXRPbBzIAOSywD9GCQB/xvy0lJ2Io0Rty+GLzIgDbaBgO7y6ClPwUGkANY7LlMh3fqHF+RObQmpfolBtbNclDeMrj6ll8xCG5YU6E+Ti1E+0AMHjNAX+iDHNhkn0HjVgyyzM+OYHzKAchmnJqsYzGoTXrHYFsflGAwBgbNjZ143VIGV+9kVpy9d9TSVWUfiMETObCGBqAy2JADRwa0w+2aAaifvAfIxQauoFQYF2Vg1LkJDBy+L/h5pAc6sQYDtRPJ814OVkkZ8MV9S7eM07uHprHD2+WHDKqq9/NIhdthYMigXDPIPQPplUcOUS3GZ+t1y2loOLWfxQyqVxj0yuCwz8D3BZpTTa9LVN47eyAGjxhY+M5VN3Fi86RyUCcRA4789CaBG2xOMjWA2+Ag1E2uY6AycOwKJbSCVvFbVHZLOTCc2zufR4u+ULfVzCBJliWJPD20QR+Qga3hWVeBwXUtBr4rnMdE1AAZQB8fj/2ms/ScATpR44yfwe7FUS7JQFROjzJ3YJDJmmijckAG6Buwz+u5RbkSUOCe0tk+DIxOGEDdlH5u3aRc/KjLmUGEAB1pnripuRBVl4Zq2DNYV/+qxgHGI1NWbLTa5ri3f6AQhYHdsQ/qivKbsU1SXZJGWjFwzoY1Ua3fx9jCZAL3Rn1p2gEHCwsJbmRhVTauI9dUauhNaJuSa1pJaWStuKk3GQDzioGhCqrhotwwmP8L48D6iQ3kz+mZ7qEYgEH5iEERVmnMmkHXwA2xDi1ScQqoCgwyumpeDpSByVlXuPC+G50H+jAGDKwNeVczAz8blZRLOlQzAwPl5hk0zR4D6QrRuHKctcH5pwyq0kQzswuDY50bw0VgMmi9nI8VGdimjBnk6CsAMZ78QGjhY1FvOraW0UQGtWcASY7W0VHvLDhaCdeXFga3Y4KHwBvXy2uPuwIY1E8YcHXZ3DLodUHcxwe4LpiTeS0rzUnUFzKMUOiWMgawjbqiP5ayLGnFM7ZkQNVKfRAYLKvWYGyDGZHXrzC4cvIz8r05n/7rCYP6CQNpp4WBquijmOMScgFbpx18X8+5TNOWMQOO0k0R1hymgRPeh1SWp1UO+FdVPWAg4IUBG+QZA7qMdr2k8FAbvMTgRh9ITXpOj7DoHBVcl6k2u3CFjnM3EQPVkdaOsg6B8nE9pcrgQDTLEpCBj90ekpmBWRIMnDC/X0ggw44+iLrCEMtBXjzpCWTQuG3f+TGDsnaHWgM6mkjflZSOtI4ZZGBwzH09ph4MXJVnGVc3FwboDZVJPKch0fgV+RsWP9FsMdjuCrSTy7grPBOD5wzMap57tuwSTqVq9ARMctF3HJdhxRzgHpWxPqgbP4fGbBnC4EyapSsGjJ+ZZ6e5ShFFM1nvZdD+xWg8M+h2GJxhf8QMnooBGDj3eGzcZsBpKqPRDt3gEcjQzyCf45pBK2byh04cOKchZal1qxl0xswEBhhxTIil6GRNQuaJXd8/ZfBx5ZgV29rDerXrfVMO7O8y+Pg4L7EXXD0662oiF0u1e8QMoO46q/oCGpsBQhpMZUysvRl/lXv7IIqOwB+1QGWe+NjXzxhwnaeJQ9GSfhVv8XbbMd7v+sKLDC5xlOv54peGMexV7MJrBrAoM53v0GUPRpJooGbMwCSWDgWzuZ5vMv/WdWfHSdmnDE5DLuvzS+yJsxJ+07Wc4Bv/PgM7RTEB8Vq3D8yoq9SUdRPpRAOzKR3Dyq2VGAouOTDUMjZlRA6u38t6Oh/4iKIWbI8RyNknOhEa0ZpqvdCX2A6+HSfiVD/G3eH9x3JwH+/ACnc9RoGszdLYPoA/lM/DhnOMVmNsGg2s1bKkLZJSGXyslut95mPu+ibSB8dtBuiluWtXOXM+jVJQM+QL1tJaIWwxSJ4wGC/fm6EPjLHpj2IdrO2DA5wiH7RDL4O2JcdFC6WarRnYZjxvR1RckHktzmb7jAF0fOMZ+FmItJU4OXgxOq/6iIHhuvMzBhnDrS4aGrGky5lRU3aTAeqqcTVXaqtawkwN+mh5KwfOOhi158vl+nGTOWNlGEoAewsjRv6AAYyDDt4Lw1zqsObJQE0GMmEYF6P5/aYzyNjoxwVTHrJ47V195xsGqUbMTdO0qK1pkui5nGGujGpN130BrTJIMMXYpfYgflAi0d/rJfqDKw/tfuYS5QMPvsqMrTOJkJm27WSRFwY0curCihEHlWiO6kKz3QODd5UDuDDw3j2D6gUGnNzSBZQxik3MkzxN8jno/4aB7bhvoGMQ9X7QvirzPNvI3MhqkzelMgOlsstg6goRRokARvElvtVp4Gc9wDh4X9Iv+VcYoDlel4NlAwHDzU3l3ancrly1FYPMdpnQSxmEtM9ARCPsLchz9RYY3itkg+tace1uj8GHBEAcxHV1MqcusbaW86rQiCIGKwYiFc8Y3OoDzk45C1eJIp/lutXAMN5nj0HVQhLytJUQpHgq4j5WRWOcRaFwTptTk3BFVnSfMDhjbJIVd1sZHzdOy70oTOmoEN830m8zoCcDt8XaitsLGLJt/QaAco9BhtYEho67Mw6HJwx8wS3rzgTbxiavMsD40TFEskpZRg5AGtBIxWgwLv5jDOjQOb8LQcP2m54G8h6Dg4VxzBkng076dJcQpAbAqjny2jGOPjEvMoBGLOQdudXeZxgCUXD/i90TA9WJye/1hVr3gTTrtCsH0Ae2NDlcY/ShwzMG3EDCUTJsAHHc+2Ne7QvncY6B04h3akZXcIywHBc3Gbz/NoODCL4Uz60269wz0PXlAxxySzvVWO4lerzLSncTwIIquYcIUgxoZvXQYwZvPqZxjltHGQuOCXcK8YZB/lsMMBSECd95k5PG3u0xwB+53fDPIwa6oQIMapRJbAgOQ8a+LAfXi08+en2EJGBg5HqfWIj7DMxvMEgzP93r9ViY/V3vq1npA+7QCqge77YT20luXe3Q2taJzRaDj49opp3zt5KKpn4gBmRg7G8xyLKNjWTZjRMYyQFHUb8JMBgAOwzC8ODnWH7C4NaNpsvMbRy7CtEzsL/FIN0m8JhB6q339BGDOKbVZ5ndSdhrDC7eje44ZQOzllPL7y8zsE8YJLFAh01btwjW+iDzEMoHuzLvEMseT11rS34iB3TrzrryXwPC+EAM3t/BwK3l4PJsbAxbXpVBWA66YRCir+uDbjjVTp5lLyIQIzHnHsMbCGsGl1uVGDGgGGioPxdZ3l9kUHkGEnW7ayc282AQSrw1Llw1DiVZM2izhzuZZwZ23nNW2N9gcGMsFLrATYX4/ioDCTjXqNvTmBioMmuzPQZetj2BtX3gZ02u04Ayyz7mUpE9kIOIKRgsyewwqNd94XKH461j0CAM74cKURmE+IODVCrvZe/E2CdiCOQ3PXjuC+onp3FsfizUugMDhrhu5Y6Gv+QVjcB9kKoMdvWB2Aesudb+stIFOHcZ2+boXMY9go/FgBa238tTaxdvW36WwMLkhm2Sp8nTUm/syKeLxM8LtOIFLjV/IbdoOMznv15goAYSAfA/+PE2cMW5sNVTMVgz4Bb7LqWLAovOWvPTrwtUvt+n4rr9+GMHm1nfMrhEivDi6y9iAGeBdnLZPREDYWAXBonuvW91S9yPGXAtPc9ECtL8H0VwxyBO0eGVA2Nz4ObmZ2Lw/raWg6Sy6r9zDtv8vKTGgoFts8fTZ/80g5jG1HHXevvEPNphIF9QgD507m8wYJgNfB2ok8qW/z4DDoyMXZJ9o88QxAwO0hdam9PuKfnlgL8jB3CWrTnABz4k/y8YTB0/JPDCuKgM7DI28usfDDkEA3qsGinEHzsdQ2JIdgZ7eszWHf7p78u8xgBmLucMbPaCGIgcBAZ+mF9GcVn/Npw+7LeFgpet3njPgFMGh7Is/1BfaLYZ6BApwW8MVR6eIyADd8NgdmO5CwX/OMN+scOgt36NaJNBWf67DIK9gIGxrekrvSIG93IQlxo9wFEMZLV3qyskvD4MA0XF/H/AYB4Yx1z20XcvaIMNOViVmjJOCaAwbIkBlEXCdbQhSW4EZcnqX2JwXQ+MiTAYXhGDDQbybaTAwFEjJHaPAVXlePpkINldZymT8k98cOsFOaAYiOP5Uk9QBi5mUEcMOM09DGYYrA4B950B/MbPLzC46yvLstkfYJApg1gIuBoetCJcBWHwZNpgjwF9YLaeSSR0EpI+9tPoAgMT9IAeWdn0RQZmPWT6747dzR+aON5z39K+VzyPGSC9jefgMJzH7mCLvi9eE4O4LxiZOi/tMCT62Tn29vFzHE8Tj3BgRf3JqjDEg52hJ4PPk1/a6PEg/wwj/iOZuIQq0/J3Lz99xlpN659BZk7PJ0a/bGdRbZ4yZv4EH09hIF4YdNNa/kcvCdfT0FYOCIbp/CIDu3wvjcnB8ecnB3QOoT99jtPnhHMjmxyn+0GiA3jCWJWDz0+/sjH04zTKdfxH7pa/x94yA6sfdZBHtWU5VTEkeNnoJEJhMKJheYf8xJN9eEZOud6YXQbo/QphlG0x7kVtQAb5msEwfZ4mVAuJ5UMbA8MoBzj6PPXj56e/akghCce4NlA/TvobsJDLyMsTaoKf/bTc6BlM8x2jZmn9Pai9nh9O80M49YABLEN+5wP94TwmLfezDS8iIINuzeD05V/6JeU7jayb6D1RfzODz9Hq2BhKKde+lnr2yGk00+fX5JhpxAB108jBk77jSxngIDAgJnnbUhwh56odBmx9WVmGq8ANhW0xjD9nMEkrTpMUdfrCDy3JmPiWUemUilhvH/gTdiQPPdD6jA5/TUb0Jhmc9CKBruVgkPOjGzWvr1iCtDhSAuvSeWy8YTANBb/idT6P/KJM/3JP2GAgsg2dRhZggBp9To4lmTwDJx/9nJQBnvGaThpdaozLo3QDn4NWRxng4jDODIaFgdUsNTM+Pul5EbNRc5wYx1ntMOCkiQyHYNHxYyovI7hjsIx1ogNG/uvr1kul3EyKDGywDyNJcasGnmYa+lO1yp0cMPpz6SOTCJUc+6f0lDGHPQYXTqU3jeu56t7a13vCBgOV26Q30k37HplCi0u5jZSDjrSdGdCXSFQz0lLy9QmV+5okN0Fo5SRvnQ0KdLWFgedMx0N/SgECA83CxHbiDYPLqN/fs30v0wbvP2ZgkhUDCgZHZWlm6eCUx5mBhpe7XjuL822JQV0KzpwiCdhi8HnHgMPtwmDw/cXLAZ7as5FgJQ3CAD5zxj7ho9RfYTDcjI2BgaplEXX80cFN5V22N3kGKrq+1yYiLzEDHdP8VWVgPIPbvmAWBiYw4IDsc/Z9YbaRuFHrhsFZPrfHnYZi4kuk40sU9hi4wIATSdrAoy+8WRhoci708TUD1ekc6RWripF3ssjvXh+wXyGJWhnESlvJQWDg55FuPSXLyMRGIqb4pUcNc3xOYY9BsrQ0ZxDkSAU91onewU6M12cm0geTNCcReJwqB88YaHA8GfRqZe8xuOsLl7FgZGLd8EPAdVtXdSX7uX7EQIroVB8YIw60nBWpdI4fpXYRg9BVaDH504MeTxGRJwycjo0WGs05+em9sk052NQHl6njzInG4kl0Jg2ln8sBN6coAzrQ6Axq5OGEWjGjNLENcqAjo9UG5LMnqS57yMjhngr1cV8Y1cpC7uzGn5+qeOhRnHYY3OkDfvKr427ZTD5ZXVWdEHj7oT6QUnzpS8VbM6Lf+FEWN0X+QXBowxyCJTgxFpGHEX3GuGu1tGUktOHmmMHX5O3oqZ9iw9h5tbqnD1ZzKLLY3vHzpzKFVLwmA8rAbDL4+tIB37EzQEmpekPTOFqt4hZ8zQzC0G5kQMWfL9Eczo2zv+OeMvjyDL7EQRg5QjjvvYz6sDaJxmw3G32BDApZbu8k/OZlv/FeDujyigOIguscmvoBkH3TGzsuYfWDn+Do4S2P7DQGF8dBfOtBe9BJRIE10rusf0HMgNc1V/rXkvMonwESb52nqZ7kYZOUqXwKsT7efxx2IgPbNPoJZe0Ir6QRDOyKAb/3K98X5jyIrB5II3wKEgyVUVh9P28hxCMyhHB2RR82MoT2841G72LNh3FwQf1yCMUNNnwIQb9sPOesh73PWVf587zkV7dNfvd9xt7a3LhDmslk4vByKhKbxwyMLC/JTOE8hdVzTmEQm9gkyz7c++kv2b/toyqNzLcb3TAu1/VasjzqnYxwMUzQLYtaxsznTTyZp4EJaX6TJFohD58OzV9Oq//3QCh+qFFoZ04P6bHZWlsMZZTJ5VABqhKzzNH73yaefu5FDkxUtfUyxYJ5yemP/T8h1gx0N/6yrMJBu1cEViVA7gg3BAZ2XqKU/fxqZRtdj5sdzJX8qD7w4en+IRt9aWCWOGt1jP5zBO4ZJMbYmIEUR69IwVZFmltYSyoz8k7b3TNQIbmvgDogHpiST+IXhwl+kaJ/j4GWYd3jecL5KLGo90Zyae3SZY20O39aE8nT0t1v5UA7w9LbV3TNvKBrzJ8kcM+ALbN0QgJwsl3DeqW3FukkbqHA0Jpk1awCJgkck2UOO1n0RAAf9bKgEe8W8/4oA6PhBlFzsafrCrvaCzcNstE+WuFZAZpY1chgMQ99Q/gWhnDbUntm6aF/noHdWw6Kqu2b6xkDEz7xsb2EZOzGOtJDWddQkD/PIPlvp/8xUAZhwey/mj7B4H/pfwz++uv/AKDn0W1QQFcoAAAAAElFTkSuQmCC" alt="טיקטין תכנון חשמל">
   <h1>הכנת מסמך פתיחת הזמנות חברת חשמל לפרויקט</h1>
-  <div class="fz" title="שינוי גודל הטופס בלבד – הדפדפן לא מושפע">
-    <span class="lbl">גודל טופס</span>
-    <button class="btn fzb" id="fzMinus" title="הקטנת הטופס">−</button>
-    <button class="btn fzv" id="fzVal" title="חזרה לגודל רגיל (100%)">100%</button>
-    <button class="btn fzb" id="fzPlus" title="הגדלת הטופס">+</button>
-  </div>
   <span class="ver" id="ver"></span>
+  <div class="fz" role="group" aria-label="גודל הטופס" title="שינוי גודל הטופס בלבד – הדפדפן לא מושפע">
+    <button id="fzMinus" title="הקטנת הטופס">−</button>
+    <button id="fzVal" title="חזרה לגודל רגיל (100%)">100%</button>
+    <button id="fzPlus" title="הגדלת הטופס">+</button>
+    <button id="fzFit" title="התאמת גודל הטופס לרוחב המסך">התאמה למסך</button>
+    <button id="fzKeep" class="keep" title="שמירת גודל התצוגה של הטופס הזה במחשב הזה">שמירת גודל טופס במסך</button>
+  </div>
 </header>
-<div class="toolbar">
-  <div class="tgrp">
-    <button class="btn primary" id="bImport" title="קליטת תמהיל דירות מקובץ PDF, Word, Excel או מצגת">📥 קליטה מקובץ</button>
+<div class="toolbar ribbon">
+  <div class="rg">
+    <span class="rwrap" data-drop><button class="rb main" id="bIn" title="קליטת נתונים לטופס – מקובץ או מאפליקציית ההנחיות"><svg><use href="#i-import"/></svg><span>קליטה ▾</span></button>
+    <div class="tkmenu" id="mIn" hidden>
+      <button class="rb" id="bImport" title="קליטת תמהיל דירות מקובץ PDF, Word, Excel או מצגת"><svg><use href="#i-import"/></svg><span>קליטה מקובץ</span></button>
+      <button class="rb" id="bGl" title="קליטת פרטי הפרויקט, הבניינים, המסחר והחניון מאפליקציית הנחיות החשמל – מהטופס הפתוח בה או מקובץ הנחיות שמור (JSON)"><svg><use href="#i-doc"/></svg><span>קליטה מההנחיות</span></button>
+      <button class="rb" id="bImpHelp" title="אילו קבצים אפשר לקלוט ואיך להכין אותם"><svg><use href="#i-info"/></svg><span>אילו קבצים אפשר לקלוט</span></button>
+    </div></span>
     <input type="file" id="fImport" accept=".pdf,.docx,.xlsx,.xlsm,.xls,.csv,.pptx" hidden>
-    <button class="btn ibtn" id="bImpHelp" title="אילו קבצים אפשר לקלוט ואיך להכין אותם">ⓘ</button>
-    <button class="btn" id="bGl" title="קליטת פרטי הפרויקט, הבניינים, המסחר והחניון מאפליקציית הנחיות החשמל – מהטופס הפתוח בה או מקובץ הנחיות שמור (JSON)">📄 קליטה מההנחיות</button>
     <input type="file" id="fGl" accept=".json,application/json" hidden>
-    <button class="btn" id="bReset" title="איפוס כל השדות">↺ איפוס טופס</button>
   </div>
-  <div class="tgrp">
-    <button class="btn" id="bSave" title="שמירת הנתונים לקובץ במחשב">💾 שמירת טופס</button>
-    <button class="btn" id="bLoad" title="טעינת טופס שנשמר קודם, או קובץ Excel שהופק מהטופס">📂 טעינת טופס</button>
+  <div class="rg">
+    <button class="rb" id="bSave" data-p="0" title="שמירת הנתונים לקובץ במחשב"><svg><use href="#i-save"/></svg><span>שמירת טופס</span></button>
+    <span class="rwrap"><button class="rb" id="bLoad" title="טעינת טופס: מהשמירות האחרונות במחשב הזה, או בחירת קובץ שנשמר קודם / קובץ Excel שהופק מהטופס"><svg><use href="#i-open"/></svg><span>טעינת טופס ▾</span></button></span>
     <input type="file" id="fLoad" accept=".json,.xlsx" hidden>
+    <button class="rb" id="bReset" data-p="0" title="איפוס כל השדות"><svg><use href="#i-reset"/></svg><span>איפוס טופס</span></button>
+    <button class="rb nar" id="bUndo" data-p="3" title="ביטול השינוי האחרון בטופס"><svg><use href="#i-undo"/></svg><span>ביטול פעולה</span></button>
+    <button class="rb nar" id="bRedo" data-p="4" title="החזרת השינוי שבוטל"><svg><use href="#i-redo"/></svg><span>החזרת פעולה</span></button>
+    <button class="rb" id="bDup" data-p="8" title="פתיחת פרויקט חדש על בסיס הטופס הנוכחי – הבניינים והחיבורים נשארים, פרטי הפרויקט ומספרי ההזמנות מתנקים"><svg><use href="#i-dup"/></svg><span>שכפול לפרויקט חדש</span></button>
+    <button class="rb nar" id="bSample" data-p="9" title="מילוי הטופס בפרויקט לדוגמה, כדי ללמוד איך הוא עובד"><svg><use href="#i-sample"/></svg><span>מילוי דוגמה</span></button>
   </div>
-  <div class="tgrp gowrap">
-    <button class="btn" id="bGo" title="מעבר לאפליקציה אחרת של המשרד – הנתונים שכבר מולאו כאן יועברו אליה אוטומטית">↗ המשך באפליקציה אחרת ▾</button>
-    <div class="gomenu" id="goMenu" hidden></div>
+  <div class="rg">
+    <span class="rwrap"><button class="rb" id="bCheck" data-p="2" title="בדיקה שכל הנתונים הנדרשים מולאו, עם רשימת מה שחסר"><svg><use href="#i-check"/></svg><span>בדיקת שלמות הטופס</span></button></span>
+    <span class="rwrap gowrap"><button class="rb wide" id="bGo" title="מעבר לאפליקציה אחרת של המשרד – הנתונים שכבר מולאו כאן יועברו אליה אוטומטית"><svg><use href="#i-next"/></svg><span>המשך באפליקציה אחרת ▾</span></button>
+    <div class="gomenu" id="goMenu" hidden></div></span>
+    <button class="rb wide go" id="bIec" disabled title="פותח את אתר חברת החשמל וממלא את ההזמנות אוטומטית – פעיל רק כשכל הבדיקות תקינות"><svg><use href="#i-bolt"/></svg><span>פתיחת ההזמנות בחברת החשמל</span></button>
   </div>
-  <div class="tgrp">
-    <button class="btn iecgo" id="bIec" disabled title="פותח את אתר חברת החשמל וממלא את ההזמנות אוטומטית – פעיל רק כשכל הבדיקות תקינות">⚡ פתיחת ההזמנות בחברת החשמל</button>
+  <div class="rg">
+    <span class="rwrap" data-drop><button class="rb" id="bOut" title="ייצוא המסמך – Excel, Word, PDF או שמירה לתיקיית הפרויקט"><svg><use href="#i-export"/></svg><span>ייצוא ▾</span></button>
+    <div class="tkmenu" id="mOut" hidden>
+      <button class="rb" id="bXlsx" title="ייצוא המסמך לקובץ אקסל – זה הקובץ שה-SKILL קורא לפתיחת ההזמנות"><svg><use href="#i-xls"/></svg><span>ייצוא Excel</span></button>
+      <button class="rb" id="bDoc" title="ייצוא המסמך לקובץ וורד"><svg><use href="#i-word"/></svg><span>ייצוא Word</span></button>
+      <button class="rb" id="bPdf" title="ייצוא המסמך לקובץ PDF"><svg><use href="#i-pdf"/></svg><span>ייצוא PDF</span></button>
+      <button class="rb" id="bToT" title="שמירת המסמך ב-Word וב-PDF ישירות לתיקיית הפרויקט בכונן T. בפעם הראשונה בוחרים את התיקייה הראשית של הפרויקטים; התיקייה של הפרויקט נמצאת לפי מספר הפרויקט. Shift+לחיצה – בחירת תיקייה ראשית אחרת"><svg><use href="#i-folder"/></svg><span>שמירה לתיקיית הפרויקט</span></button>
+    </div></span>
+    <button class="rb" id="bPrint" data-p="5" title="הדפסת מסמך פתיחת ההזמנות"><svg><use href="#i-print"/></svg><span>הדפסה</span></button>
+    <button class="rb" id="bMail" data-p="6" title="פתיחת הודעת דוא״ל חדשה עם סיכום ההזמנות"><svg><use href="#i-mail"/></svg><span>שליחה במייל</span></button>
   </div>
-  <div class="tgrp">
-    <button class="btn" id="bXlsx" title="ייצוא המסמך לקובץ אקסל – זה הקובץ שה-SKILL קורא לפתיחת ההזמנות">ייצוא Excel</button>
-    <button class="btn" id="bDoc" title="ייצוא המסמך לקובץ וורד">ייצוא Word</button>
-    <button class="btn" id="bPdf" title="ייצוא המסמך לקובץ PDF">ייצוא PDF</button>
-    <button class="btn" id="bToT" title="שמירת המסמך ב-Word וב-PDF ישירות לתיקיית הפרויקט בכונן T. בפעם הראשונה בוחרים את התיקייה הראשית של הפרויקטים; התיקייה של הפרויקט נמצאת לפי מספר הפרויקט. Shift+לחיצה – בחירת תיקייה ראשית אחרת">📁 שמירה לתיקיית הפרויקט</button>
+  <div class="rg end">
+    <span class="rwrap" id="rMoreWrap" hidden><button class="rb" id="bMore" title="כפתורים נוספים שלא נכנסו בשורה"><svg><use href="#i-more"/></svg><span>עוד</span></button>
+    <div class="tkmenu" id="rMoreMenu" hidden></div></span>
+    <button class="rb" id="bFull" data-p="7" title="הצגת הטופס על כל המסך, בלי סרגלי הדפדפן"><svg><use href="#i-full"/></svg><span>מסך מלא</span></button>
+    <a class="rb" id="bHome" data-p="1" href="https://tiktiny.github.io/tiktin-tools/" title="חזרה לדף האפליקציות של המשרד – הנתונים שהוזנו נשמרים"><svg><use href="#i-home"/></svg><span>אפליקציה ראשית</span></a>
   </div>
+</div>
 </div>
 <div class="imphelp" id="impHelp" hidden>
   <b>קליטת תמהיל דירות מקובץ – אילו קבצים עובדים</b>
@@ -437,30 +530,88 @@ div.f > span.lbl{min-height:2.6em;display:flex;flex-wrap:wrap;align-items:flex-e
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V10';
-const VDATE = '09.11.2026';
+const VERSION = 'V11';
+const VDATE = '13.11.2026';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
 const FORMAT_ID = 'tiktin-iec-orders';
-document.getElementById('ver').textContent = 'גרסה ' + VERSION + ' · ' + VDATE;
-document.getElementById('ver2').textContent = 'גרסה ' + VERSION + ' · ' + VDATE;
+document.getElementById('ver').textContent = 'גרסה ' + VERSION.replace(/^V/,'') + ' · עודכן ' + VDATE;
+document.getElementById('ver2').textContent = 'גרסה ' + VERSION.replace(/^V/,'') + ' · עודכן ' + VDATE;
 
-/* ---------- גודל טופס (ללא השפעה על הדפדפן) ---------- */
-(function(){
-  const MIN=0.6, MAX=1.5, STEP=0.1, KEY='tiktin_iec_orders_zoom';
-  let z=1; try{ const s=parseFloat(localStorage.getItem(KEY)); if(s>=MIN&&s<=MAX) z=s; }catch(e){}
-  const val=document.getElementById('fzVal');
-  function apply(){
-    z=Math.round(Math.min(MAX,Math.max(MIN,z))*10)/10;
-    document.documentElement.style.setProperty('--fz', z);
-    val.textContent=Math.round(z*100)+'%';
-    try{ localStorage.setItem(KEY, z); }catch(e){}
+/* ===== ממשק אחיד טיקטין: סרגל, זום, תפריטים, הודעות ===== */
+const TK=(function(){
+  const $=id=>document.getElementById(id);
+  // כיתוב הכפתור נשמר בתוך span, כדי שהחלפת טקסט זמנית ("מכין PDF…") לא תמחק את הסמל
+  document.querySelectorAll('.rb').forEach(b=>Object.defineProperty(b,'textContent',{configurable:true,
+    get(){ const s=this.querySelector('span'); return s?s.textContent:''; },
+    set(v){ const s=this.querySelector('span'); if(s) s.textContent=v; }}));
+  let tT=0;
+  function toast(msg){ let t=$('tkToast'); if(!t){ t=document.createElement('div'); t.id='tkToast'; t.setAttribute('role','status'); document.body.appendChild(t); }
+    t.textContent=msg; t.hidden=false; clearTimeout(tT); tT=setTimeout(()=>{ t.hidden=true; },2600); }
+  // תפריט נפתח מתחת לכפתור
+  let openM=null;
+  function closeMenu(){ if(openM){ openM.remove(); openM=null; } }
+  function menu(anchor, build){ const was=openM&&openM._a===anchor; closeMenu(); if(was) return null;
+    const m=document.createElement('div'); m.className='tkmenu'; m._a=anchor; build(m);
+    const host=anchor.closest('.rwrap')||anchor.parentElement; host.style.position='relative'; host.appendChild(m); openM=m;
+    if(m.getBoundingClientRect().left<4){ m.style.right='auto'; m.style.left='0'; }
+    return m; }
+  document.addEventListener('click',e=>{ if(openM && !openM.contains(e.target) && !openM._a.contains(e.target)) closeMenu(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeMenu(); });
+  // כפתורים שלא נכנסים בשורה אחת עוברים לתפריט "עוד", לפי סדר עדיפות
+  const rib=document.querySelector('.ribbon'), moreW=$('rMoreWrap'), moreM=$('rMoreMenu'), moreB=$('bMore');
+  const all=[...rib.querySelectorAll('.rb[data-p]')].map((b,i)=>({b, home:b.parentElement, next:b.nextElementSibling, p:+b.dataset.p, i}));
+  function layout(){
+    all.slice().reverse().forEach(o=>{ if(o.b.parentElement!==o.home) o.home.insertBefore(o.b, o.next&&o.next.parentElement===o.home?o.next:null); });
+    moreW.hidden=true; moreM.hidden=true;
+    if(matchMedia('(max-width:700px)').matches){ const ex=all.filter(o=>o.p>0); if(ex.length){ moreW.hidden=false; ex.forEach(o=>moreM.appendChild(o.b)); } return; }
+    const order=all.slice().sort((x,y)=>y.p-x.p||y.i-x.i); let k=0;
+    while(rib.scrollWidth>rib.clientWidth+1 && k<order.length){ moreW.hidden=false; moreM.appendChild(order[k].b); k++; }
+    if(k===1){ const o=order[0]; o.home.insertBefore(o.b, o.next&&o.next.parentElement===o.home?o.next:null); moreW.hidden=true; if(rib.scrollWidth>rib.clientWidth+1){ moreW.hidden=false; moreM.appendChild(o.b); } }
+    const inM=[...moreM.children]; inM.sort((x,y)=>all.find(o=>o.b===x).i-all.find(o=>o.b===y).i).forEach(x=>moreM.appendChild(x));
   }
-  document.getElementById('fzMinus').onclick=()=>{ z-=STEP; apply(); };
-  document.getElementById('fzPlus').onclick=()=>{ z+=STEP; apply(); };
-  val.onclick=()=>{ z=1; apply(); };
-  apply();
+  moreB.addEventListener('click',e=>{ e.stopPropagation(); moreM.hidden=!moreM.hidden; moreM.style.right='0'; moreM.style.left='auto'; if(!moreM.hidden && moreM.getBoundingClientRect().left<4){ moreM.style.right='auto'; moreM.style.left='0'; } });
+  document.addEventListener('click',e=>{ if(!moreM.hidden && !moreW.contains(e.target)) moreM.hidden=true; });
+  moreM.addEventListener('click',e=>{ if(e.target.closest('.rb')) moreM.hidden=true; });
+  // כפתור שפותח רשימת אפשרויות (קליטה, ייצוא). בזמן פעולה ארוכה הכפתור הראשי מציג את ההתקדמות
+  document.querySelectorAll('.rwrap[data-drop]').forEach(w=>{ const btn=w.querySelector(':scope>.rb'), m=w.querySelector(':scope>.tkmenu'), lbl=btn.textContent, items=[...m.querySelectorAll('.rb')];
+    btn.addEventListener('click',()=>{ const o=m.hidden; closeMenu(); document.querySelectorAll('.rwrap[data-drop]>.tkmenu').forEach(x=>x.hidden=true); m.hidden=!o; m.style.right='0'; m.style.left='auto'; if(!m.hidden && m.getBoundingClientRect().left<4){ m.style.right='auto'; m.style.left='0'; } });
+    m.addEventListener('click',e=>{ if(e.target.closest('.rb')) m.hidden=true; });
+    document.addEventListener('click',e=>{ if(!m.hidden && !w.contains(e.target)) m.hidden=true; });
+    const ob=new MutationObserver(()=>{ const busy=items.find(x=>x.disabled); btn.textContent=busy?busy.textContent:lbl; btn.disabled=!!busy; });
+    items.forEach(x=>ob.observe(x,{attributes:true,attributeFilter:['disabled']})); });
+  addEventListener('resize',layout); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(layout); layout();
+  // גודל טופס: משנה רק את הטופס, לא את הדפדפן. נשמר רק בלחיצה על "שמירת גודל טופס במסך"
+  function zoom(KEY){ const MIN=0.6, MAX=1.5, STEP=0.1; let z=1;
+    try{ const s=parseFloat(localStorage.getItem(KEY)); if(s>=MIN&&s<=MAX) z=s; }catch(e){}
+    const val=$('fzVal');
+    function apply(){ z=Math.round(Math.min(MAX,Math.max(MIN,z))*100)/100; document.documentElement.style.setProperty('--fz', z); val.textContent=Math.round(z*100)+'%'; }
+    $('fzMinus').onclick=()=>{ z-=STEP; apply(); };
+    $('fzPlus').onclick=()=>{ z+=STEP; apply(); };
+    val.onclick=()=>{ z=1; apply(); };
+    $('fzFit').onclick=()=>{ z=(document.documentElement.clientWidth-8)/1280; apply(); };
+    $('fzKeep').onclick=()=>{ try{ localStorage.setItem(KEY, z); toast('גודל הטופס נשמר במחשב הזה: '+Math.round(z*100)+'%'); }catch(e){ toast('לא ניתן לשמור במחשב הזה'); } };
+    apply(); }
+  // מסך מלא
+  function full(btn){ const set=()=>{ btn.textContent=document.fullscreenElement?'יציאה ממסך מלא':'מסך מלא'; layout(); };
+    btn.addEventListener('click',()=>{ if(document.fullscreenElement) document.exitFullscreen(); else if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>toast('הדפדפן לא מאפשר מסך מלא')); });
+    document.addEventListener('fullscreenchange',set); }
+  // ביטול והחזרת פעולה: get מחזיר את מצב הטופס כטקסט, set משחזר אותו
+  function history(get,set,bU,bR){ const H={u:[],r:[],last:get(),lock:false,t:0};
+    const btns=()=>{ bU.disabled=!H.u.length; bR.disabled=!H.r.length; };
+    const flush=()=>{ clearTimeout(H.t); H.t=0; const s=get(); if(s===H.last) return; H.u.push(H.last); if(H.u.length>60) H.u.shift(); H.r.length=0; H.last=s; btns(); };
+    const go=(from,to)=>{ flush(); if(!from.length) return; to.push(H.last); const s=from.pop(); H.lock=true; try{ set(s); } finally{ H.lock=false; } H.last=get(); btns(); };
+    bU.addEventListener('click',()=>go(H.u,H.r)); bR.addEventListener('click',()=>go(H.r,H.u)); btns();
+    return { note(){ if(H.lock) return; clearTimeout(H.t); H.t=setTimeout(flush,450); } }; }
+  // שמירות אחרונות במחשב הזה
+  function recent(KEY){ const read=()=>{ try{ return JSON.parse(localStorage.getItem(KEY)||'[]')||[]; }catch(e){ return []; } };
+    return { list:read,
+      add(name,data){ let a=read().filter(x=>x.n!==name); a.unshift({n:name,t:Date.now(),d:data}); a=a.slice(0,8);
+        for(;;){ try{ localStorage.setItem(KEY,JSON.stringify(a)); break; }catch(e){ if(!a.length) break; a.pop(); } } } }; }
+  const when=t=>new Date(t).toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  return {toast,menu,closeMenu,layout,zoom,full,history,recent,when};
 })();
+TK.zoom('tiktin_iec_orders_zoom');
 
 /* ---------- IEC tables (כמו בטופס רוחב פיר) ---------- */
 const ROOMS = ['2-3','4','5','6','7'];
@@ -556,7 +707,7 @@ function newExtra(){ return {type:'com', assign:'bld', loc:'', desc:'', size:'',
 let PROJ = defaultProj();
 try{ const s=localStorage.getItem('tiktin_iec_orders'); if(s) PROJ=projFrom(JSON.parse(s)); }catch(e){}
 let S = PROJ.list[PROJ.active];
-function persist(){ try{ localStorage.setItem('tiktin_iec_orders', JSON.stringify(PROJ)); }catch(e){} }
+function persist(){ try{ localStorage.setItem('tiktin_iec_orders', JSON.stringify(PROJ)); }catch(e){} if(window.TKH) TKH.note(); }
 function bldName(b,i){ return (b.building||'').trim() || ('בניין '+(i+1)); }
 const num = (v,d=0) => { const x=parseFloat(String(v).replace(',','.')); return isFinite(x)?x:d; };
 const fmt=(v,d=1)=> (Math.round(v*10**d)/10**d).toLocaleString('he-IL');
@@ -1085,12 +1236,11 @@ const fname = ext => `פתיחת הזמנות חחי - ${PROJ.project.name||'פ�
 let DL_SINK=null;   // כשמוגדר – הקבצים נאספים (לשמירה לתיקייה) במקום הורדה
 function download(blob,name){ if(DL_SINK){ DL_SINK.push({blob,name}); return; } const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); }
 document.getElementById('bSave').addEventListener('click',()=>download(new Blob([JSON.stringify(PROJ,null,1)],{type:'application/json'}), fname('json')));
-document.getElementById('bLoad').addEventListener('click',()=>document.getElementById('fLoad').click());
 document.getElementById('fLoad').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return;
   try{
     let o;
     if(/\.xlsx$/i.test(f.name)){
-      if(!window.ExcelJS) throw new Error('lib');
+      await loadLib('exceljs');
       const wb=new ExcelJS.Workbook(); await wb.xlsx.load(await f.arrayBuffer());
       const ws=wb.getWorksheet('נתונים למערכת'); if(!ws) throw new Error('nodata');
       let txt=''; for(let r=4;r<=ws.rowCount;r++){ const v=ws.getCell(r,1).value; if(typeof v==='string') txt+=v; }
@@ -1143,7 +1293,7 @@ function secBlocks(secs){
 
 /* ---------- PDF ---------- */
 async function exportPdf(){
-  if(!window.html2canvas||!window.jspdf){ alert('ספריית PDF לא נטענה – בדוק חיבור לאינטרנט'); return; }
+  try{ await loadLib('h2c'); await loadLib('jspdf'); }catch(e){ alert('ספריית PDF לא נטענה – בדוק חיבור לאינטרנט'); return; }
   const btn=document.getElementById('bPdf'); btn.disabled=true; const old=btn.textContent; btn.textContent='מכין PDF…';
   const host=document.createElement('div'); host.className='rp'; host.style.cssText='position:fixed;left:-10000px;top:0;width:794px;z-index:-1';
   document.body.appendChild(host);
@@ -1166,7 +1316,7 @@ document.getElementById('bPdf').addEventListener('click',()=>exportPdf());
 
 /* ---------- Word ---------- */
 async function exportDoc(){
-  if(!window.docx){ alert('ספריית Word לא נטענה – בדוק חיבור לאינטרנט'); return; }
+  try{ await loadLib('docx'); }catch(e){ alert('ספריית Word לא נטענה – בדוק חיבור לאינטרנט'); return; }
   const btn=document.getElementById('bDoc'); btn.disabled=true; const old=btn.textContent; btn.textContent='מכין Word…';
   try{
     const {Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,WidthType,AlignmentType,BorderStyle,ShadingType,ImageRun,Header,Footer,PageNumber,VerticalAlign}=window.docx;
@@ -1206,7 +1356,7 @@ document.getElementById('bDoc').addEventListener('click',()=>exportDoc());
 
 /* ---------- Excel ---------- */
 document.getElementById('bXlsx').addEventListener('click',async()=>{
-  if(!window.ExcelJS){ alert('ספריית האקסל לא נטענה – בדוק חיבור לאינטרנט'); return; }
+  try{ await loadLib('exceljs'); }catch(e){ alert('ספריית האקסל לא נטענה – בדוק חיבור לאינטרנט'); return; }
   const wb=new ExcelJS.Workbook(); wb.creator='Tiktin';
   const thin={style:'thin',color:{argb:'FFCFD4DA'}}, border={top:thin,left:thin,bottom:thin,right:thin};
   const fillOf=c=>({type:'pattern',pattern:'solid',fgColor:{argb:c}});
@@ -1265,6 +1415,10 @@ document.getElementById('bXlsx').addEventListener('click',async()=>{
 });
 
 const LIBS = {
+  exceljs:['https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js', ()=>window.ExcelJS],
+  docx:  ['https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js', ()=>window.docx],
+  h2c:   ['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', ()=>window.html2canvas],
+  jspdf: ['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', ()=>window.jspdf],
   xlsx:  ['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', ()=>window.XLSX],
   mammoth:['https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js', ()=>window.mammoth],
   pdf:   ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js', ()=>window.pdfjsLib],
@@ -1542,7 +1696,7 @@ function renderOrdNos(force){
 { const _rc=recalc; recalc=function(){ _rc.apply(this,arguments); renderOrdNos(); }; }
 document.getElementById('bOrdLoad').addEventListener('click',()=>document.getElementById('fOrdLoad').click());
 document.getElementById('fOrdLoad').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return;
-  try{ if(!window.ExcelJS) throw new Error('lib'); const wb=new ExcelJS.Workbook(); await wb.xlsx.load(await f.arrayBuffer());
+  try{ await loadLib('exceljs'); const wb=new ExcelJS.Workbook(); await wb.xlsx.load(await f.arrayBuffer());
     const on=readOrdNos(wb); if(!on){ alert('לא נמצאו מספרי הזמנות בקובץ.\nיש לבחור את קובץ האקסל שהופק מהטופס, אחרי שה-SKILL רשם בגיליון "הזמנות" את מספרי ההזמנות (עמודה "מספר הזמנה שהתקבל").'); return; }
     const keys=new Set(LAST.O.orders.map(ordKey)); let hit=0, miss=0;
     Object.entries(on).forEach(([k,v])=>{ if(keys.has(k)){ PROJ.ordNo[k]=v; hit++; } else miss++; });
@@ -1562,7 +1716,7 @@ function floorMap(b){
   return {N, fl};
 }
 document.getElementById('bAptXlsx').addEventListener('click',async()=>{
-  if(!window.ExcelJS){ alert('ספריית האקסל לא נטענה – בדוק חיבור לאינטרנט'); return; }
+  try{ await loadLib('exceljs'); }catch(e){ alert('ספריית האקסל לא נטענה – בדוק חיבור לאינטרנט'); return; }
   if(!LAST) recalc(); const O=LAST.O;
   const wb=new ExcelJS.Workbook(); wb.creator='Tiktin';
   const ws=wb.addWorksheet('פירוט דירות',{views:[{rightToLeft:true,showGridLines:false}],pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0}});
@@ -1802,6 +1956,58 @@ document.body.insertAdjacentHTML('beforeend', `<div id="extDlg" class="dlg"><div
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" onclick="this.closest('.dlg').style.display='none'">הבנתי</button></div></div></div>`);
 
 loadDocStore().then(()=>fullRender());
+
+/* ---------- ממשק אחיד: כפתורים נוספים ---------- */
+TK.full(document.getElementById('bFull'));
+window.TKH=TK.history(()=>JSON.stringify(PROJ), s=>{ PROJ=projFrom(JSON.parse(s)); S=PROJ.list[PROJ.active]; fullRender(); }, document.getElementById('bUndo'), document.getElementById('bRedo'));
+const formEmpty = () => JSON.stringify(PROJ)===JSON.stringify(defaultProj());
+const RECENT=TK.recent('tiktin_iec_orders_recent');
+document.getElementById('bSave').addEventListener('click',()=>RECENT.add((PROJ.project.name||'').trim()||'פרויקט ללא שם', JSON.parse(JSON.stringify(PROJ))));
+document.getElementById('bLoad').addEventListener('click',e=>{ TK.menu(e.currentTarget, m=>{
+  const a=RECENT.list();
+  const f=document.createElement('button'); f.className='mi'; f.innerHTML='<b>בחירת קובץ מהמחשב…</b><small>קובץ טופס שנשמר קודם, או קובץ Excel שהופק מהטופס</small>';
+  f.onclick=()=>{ TK.closeMenu(); document.getElementById('fLoad').click(); }; m.appendChild(f);
+  const t=document.createElement('div'); t.className='mt'; t.textContent='שמירות אחרונות במחשב הזה'; m.appendChild(t);
+  if(!a.length){ const n=document.createElement('div'); n.className='mn'; n.textContent='עדיין אין שמירות. כל לחיצה על "שמירת טופס" מוסיפה את הטופס לרשימה הזאת.'; m.appendChild(n); }
+  a.forEach(x=>{ const b=document.createElement('button'); b.className='mi'; b.innerHTML=esc(x.n)+'<small>נשמר ב-'+TK.when(x.t)+'</small>';
+    b.onclick=()=>{ TK.closeMenu(); if(!formEmpty() && !confirm('לפתוח את "'+x.n+'" במקום הטופס הנוכחי?')) return; PROJ=projFrom(x.d); S=PROJ.list[PROJ.active]; fullRender(); TK.toast('הטופס "'+x.n+'" נפתח'); };
+    m.appendChild(b); });
+}); });
+document.getElementById('bCheck').addEventListener('click',e=>{ recalc();
+  document.querySelectorAll('.tkmiss').forEach(x=>x.classList.remove('tkmiss'));
+  const iss=LAST.iss, P=PROJ.project, miss=[];
+  ['name','client','hp','city','gush','contact','phone','email','leader'].forEach(k=>{ if(!String(P[k]||'').trim()){ const el=document.querySelector('#projGrid [data-p="'+k+'"]'); if(el) miss.push(el); } });
+  const mt=document.getElementById('meters'); if(mt && !mt.value) miss.push(mt);
+  miss.forEach(el=>{ const f=el.closest('.fld')||el; f.classList.add('tkmiss'); const off=()=>{ if(el.value) f.classList.remove('tkmiss'); }; el.addEventListener('input',off); el.addEventListener('change',off); });
+  if(!iss.length){ TK.toast('הטופס שלם – אין פריטים לטיפול'); return; }
+  TK.menu(e.currentTarget, m=>{ m.style.minWidth='380px';
+    m.innerHTML='<div class="mt">'+iss.length+' פריטים לטיפול</div><ul>'+iss.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>'+(miss.length?'<div class="mn">שדות החובה החסרים בבניין הפעיל ובפרטי הפרויקט סומנו באדום.</div>':''); });
+  if(miss.length) (miss[0].closest('.card')||miss[0]).scrollIntoView({behavior:'smooth',block:'start'});
+});
+document.getElementById('bSample').addEventListener('click',()=>{
+  if(!formEmpty() && !confirm('מילוי הדוגמה יחליף את הנתונים שבטופס. להמשיך?\n(אפשר לחזור אחורה בכפתור "ביטול פעולה")')) return;
+  const T=(count,rooms,area)=>({count:String(count), rooms, area:String(area), conn:defaultConn(rooms,area)||'', auto:true});
+  PROJ=projFrom({project:{name:'פרויקט לדוגמה', num:'00000', client:'חברת הדוגמה בע״מ', hp:'510000000', city:'תל אביב', gush:'גוש 1234 חלקות 56-57', contact:'ישראל ישראלי', phone:'050-0000000', email:'example@example.co.il', leader:LEADERS[0][0]},
+    list:[{building:'בניין A', floors:'8', height:'26', meters:'ריכוז מונים', pub:'3x63', groups:[{from:'1',to:'8',types:[T(2,'4',100),T(2,'5',120)]}]},
+          {building:'בניין B', floors:'12', height:'38', meters:'פיזור מונים', pub:'3x80', groups:[{from:'1',to:'11',types:[T(4,'4',105)]},{from:'12',to:'12',types:[T(2,'6',160)]}]}],
+    temp:{size:'3x250', link:'0'}});
+  S=PROJ.list[0]; fullRender(); TK.toast('הטופס מולא בפרויקט לדוגמה');
+});
+document.getElementById('bDup').addEventListener('click',()=>{
+  if(!confirm('לפתוח פרויקט חדש על בסיס הטופס הנוכחי?\nהבניינים והחיבורים נשארים. שם הפרויקט, מספר הפרויקט, גוש וחלקה, כתובת, מספרי ההזמנות והמסמכים המצורפים מתנקים.')) return;
+  const o=JSON.parse(JSON.stringify(PROJ)); ['name','num','gush','street','house'].forEach(k=>o.project[k]=''); o.ordNo={}; delete o.iec; delete o.docs;
+  PROJ=projFrom(o); S=PROJ.list[PROJ.active]; idbClear(); DOCSTORE={}; fullRender();
+  const el=document.querySelector('#projGrid [data-p="name"]'); if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.focus(); }
+  TK.toast('נפתח פרויקט חדש על בסיס הקודם – יש למלא את פרטי הפרויקט');
+});
+document.getElementById('bPrint').addEventListener('click',()=>{ recalc(); window.print(); });
+document.getElementById('bMail').addEventListener('click',()=>{ recalc();
+  const P=PROJ.project, O=LAST.O, iss=LAST.iss;
+  const lines=['מסמך פתיחת הזמנות חברת חשמל','פרויקט: '+(P.name||'–')+(P.num?' ('+P.num+')':''),'לקוח: '+(P.client||'–'),'','הזמנות לפתיחה ('+O.orders.length+'):',
+    ...O.orders.map(o=>o.seq+'. '+o.kind+' – '+o.target+(o.conns?' – '+o.conns:'')),'', iss.length?('פריטים פתוחים לטיפול: '+iss.length):'המסמך מוכן לפתיחת ההזמנות.','','הקובץ המלא מיוצא מהטופס ב-Excel, Word או PDF ומצורף בנפרד.'];
+  let body=lines.join('\n'); if(body.length>1700) body=body.slice(0,1700)+'\n…';
+  location.href='mailto:?subject='+encodeURIComponent('פתיחת הזמנות חח״י – '+(P.name||'פרויקט'))+'&body='+encodeURIComponent(body);
+});
 </script>
 </body>
 </html>
