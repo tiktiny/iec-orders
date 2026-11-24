@@ -391,7 +391,7 @@ body.tkprint #inputs,body.tkprint #results>.card~.card,body.tkprint footer{displ
     <h2><span class="num">1</span>פרטי הפרויקט והלקוח המזמין</h2>
     <details class="help"><summary>הסבר</summary><div>
       הנתונים משמשים לבחירת הלקוח באתר חברת החשמל (שם החברה + ח.פ. יחד), למילוי הכתובת (יישוב, גוש, חלקה ומגרש) ולניסוח כתובת החיבור של כל הזמנה.<br>
-      <b>ראש הצוות</b> – הקוד שלו נוסף בסוגריים מרובעים בסוף כתובת החיבור, למשל: הזמנה לבניין A פרויקט נהוראי גוננים ירושלים [רצ7]. חובה לבחור – לא מסיקים מאיש הקשר.<br>
+      <b>ראש הצוות</b> – הקוד שלו נוסף בסוגריים מרובעים בתחילת כתובת החיבור, למשל: [רצ7] בניין A פרויקט נהוראי גוננים ירושלים. כתובת ארוכה מ־50 תווים נחתכת אוטומטית בסופה. חובה לבחור – לא מסיקים מאיש הקשר.<br>
       רחוב ומספר בית – רשות. בפתיחת ההזמנה בוחרים יישוב ומשאירים רחוב ומספר ריקים; הכתובת נכתבת כתיאור חופשי.
     </div></details>
     <div class="grid g4" id="projGrid"></div>
@@ -416,7 +416,7 @@ body.tkprint #inputs,body.tkprint #results>.card~.card,body.tkprint footer{displ
       <label class="f"><span class="lbl">סה״כ דירות בבניין – מחושב</span><span class="ro hl" id="unitsTotal" title="מחושב אוטומטית ממקבצי הקומות">0</span></label>
       <div class="f" id="bldTypeCell"><span class="lbl">קטגוריית הבניין <span id="bldTypeSt"></span></span><div class="catseg" id="bldType" role="group" aria-label="קטגוריית הבניין"></div></div>
       <label class="f"><span class="lbl">חיבורי דירות לפי גודל – מחושב</span><span class="ro" id="connsTotal" title="כמות דירות לכל גודל חיבור">—</span></label>
-      <label class="f"><span class="lbl">כתובת החיבור להזמנה</span><span class="ro" id="addrBld" title="מהות + בניין + פרויקט + עיר + קוד ראש צוות">—</span></label>
+      <label class="f"><span class="lbl">כתובת החיבור להזמנה</span><span class="ro" id="addrBld" title="קוד ראש צוות + בניין + פרויקט + עיר – עד 50 תווים">—</span></label>
     </div>
     <div class="bldbody">
     <div class="bcol">
@@ -527,7 +527,7 @@ body.tkprint #inputs,body.tkprint #results>.card~.card,body.tkprint footer{displ
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V12';
+const VERSION = 'V13';
 const VDATE = '24.11.2026';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
@@ -666,7 +666,7 @@ const PROJ_FIELDS = [
   ['contact','איש קשר','text','איש הקשר להזמנה'],
   ['phone','טלפון','num','טלפון איש הקשר'],
   ['email','דוא״ל','text','דוא״ל איש הקשר'],
-  ['leader','ראש צוות מטפל','leader','הקוד נוסף בסוגריים מרובעים בסוף כתובת החיבור'],
+  ['leader','ראש צוות מטפל','leader','הקוד נוסף בסוגריים מרובעים בתחילת כתובת החיבור'],
   ['sms','טלפון לקבלת SMS (קבוע)','num','מספר קבוע של המשרד לקבלת הודעות SMS מחברת החשמל – נשמר לכל הפרויקטים']
 ];
 /* פרטים קבועים של המשרד – נשמרים בדפדפן ואינם מתאפסים בטופס חדש */
@@ -1027,7 +1027,11 @@ function renderDocs(){
 
 /* ---------- orders ---------- */
 function leaderCode(){ const l=LEADERS.find(([n])=>n===PROJ.project.leader); return l?l[1]:''; }
-function addrTail(){ const P=PROJ.project, c=leaderCode(); return ` פרויקט ${(P.name||'').trim()||'…'} ${(P.city||'').trim()||'…'} [${c||'—'}]`; }
+function addrTail(){ const P=PROJ.project; return ` פרויקט ${(P.name||'').trim()||'…'} ${(P.city||'').trim()||'…'}`; }
+/* כתובת החיבור: קוד ראש הצוות בהתחלה, ואם ארוכה מ־50 תווים – נחתכת בסופה (רצוי בסוף מילה) */
+const ADDR_MAX=50;
+function fitAddr(body){ const full=`[${leaderCode()||'—'}] ${body}`.replace(/\s+/g,' ').trim(); if(full.length<=ADDR_MAX) return {addr:full, full, cut:false};
+  let a=full.slice(0,ADDR_MAX); const sp=a.lastIndexOf(' '); if(full[ADDR_MAX]!==' ' && sp>=ADDR_MAX*0.7) a=a.slice(0,sp); return {addr:a.trim(), full, cut:true}; }
 function buildOrders(){
   const P=PROJ.project, tail=addrTail(), out=[];
   const calcs=PROJ.list.map(b=>compute(b));
@@ -1061,7 +1065,7 @@ function buildOrders(){
     out.push({kind:'חיבור זמני', type:'temp', size:PROJ.temp.size.toUpperCase(), target:'כל המגרש', addr:'חיבור זמני למגרש'+tail, meters:'—', conns:`1 × ${PROJ.temp.size.toUpperCase()}`, total:1, note:`חיבור זמני לאתר בנייה; לקשר ל${link}; לצרף תכנית מדידה`, link:li});
     out.push({kind:'עע״א', type:'infra', target:'כל המגרש', addr:'עע״א לחיבור זמני למגרש'+tail, meters:'—', conns:'עבודה בתשתית – לפי האתר', total:0, note:`עע״א לחיבור הזמני; לקשר ל${link}`, link:li});
   }
-  out.forEach((o,i)=>{ o.seq=i+1; o.len=o.addr.length; o.perm=i<nPerm; });
+  out.forEach((o,i)=>{ const f=fitAddr(o.addr); o.addr=f.addr; o.addrFull=f.full; o.cut=f.cut; o.seq=i+1; o.len=o.addr.length; o.perm=i<nPerm; });
   return {orders:out, calcs};
 }
 
@@ -1087,7 +1091,6 @@ function issues(O){
     if(!pk.evIncl && !pk.ev.size) out.push('טעינת רכבים בחיבור נפרד: לא נבחר גודל חיבור');
     parkItems().forEach(x=>{ if(String(x.loc||'').trim() && bldIndexOf(x.loc)<0) out.push(`${typeLbl(x)}: הבניין "${x.loc}" לא קיים בלשוניות`); }); }
   ['com','office','public','other'].forEach(t=>{ const r=PROJ.extras.filter(x=>x.type===t); if(r.some(xOnProj)&&r.some(x=>!xOnProj(x))) out.push(`${XTYPES[t].l}: הוזנו גם חיבור לבניין וגם חיבור כללי לכל הפרויקט – יש לבחור אחד מהשניים`); });
-  O.orders.forEach(o=>{ if(o.len>50) out.push(`כתובת החיבור של "${o.target}" (${o.kind}) ארוכה מ־50 תווים (${o.len}) – המתכנן יחליט מה להשמיט; אין קיצור אוטומטי`); });
   ['decl','plan','poa'].forEach(k=>{ if(PROJ.docs[k].got!=='כן') out.push('מסמך חובה לא התקבל: '+DOCS.find(d=>d.k===k).l); });
   if(PROJ.temp.size && PROJ.docs.survey.got!=='כן') out.push('יש חיבור זמני – חובה תכנית מדידה של האתר');
   if(PROJ.send.mode==='wait' && !(num(PROJ.send.wait)>0)) out.push('נבחרה המתנה לבדיקה – יש להזין זמן המתנה בדקות');
@@ -1117,8 +1120,8 @@ function sections(O, iss){
   const RES=(PROJ.iec&&PROJ.iec.orders)||[]; const resOf=o=>RES.find(r=>r.seq===o.seq&&r.target===o.target);
   const hasRes=RES.some(r=>r.number||r.status!=='ממתין');
   secs.push({title:'רשימת ההזמנות לפתיחה – לפי הסדר', head:['#','סוג ההזמנה','מיועדת ל־','כתובת החיבור (תיאור)','תווים','פירוט חיבורים','הערות להזמנה',...(hasRes?['מספר הזמנה']:[])],
-    rows:ord.map(o=>{ const r=resOf(o); return [o.seq,o.kind,o.target,o.addr,o.len>50?o.len+' ⚠':o.len,o.conns||'–',o.note,...(hasRes?[r?(r.number||r.status):'–']:[])]; }), wide:3, small:true,
-    note:'סדר הפתיחה: קודם כל ההזמנות הקבועות (בניין אחרי בניין, ואחריהם החיבורים הנפרדים) – ורק אחר כך שתי ההזמנות של החיבור הזמני (חיבור זמני ועע״א).\nהערות ההזמנה באתר מוגבלות ל־100 תווים ונשמרת רק תחילת הטקסט – לכן הסדר קבוע: מספרי ההזמנות הקודמות בפרויקט, ואחריהם שאר הפרטים.\nכתובת החיבור: בוחרים יישוב, משאירים רחוב ומספר ריקים וכותבים את התיאור כפי שמופיע כאן – עד 50 תווים, בלי המילה "הזמנה". אם האתר דוחה את האורך – עוצרים והמתכנן מחליט מה להשמיט.'});
+    rows:ord.map(o=>{ const r=resOf(o); return [o.seq,o.kind,o.target,o.addr,o.cut?o.len+' ✂':o.len,o.conns||'–',o.note,...(hasRes?[r?(r.number||r.status):'–']:[])]; }), wide:3, small:true,
+    note:'סדר הפתיחה: קודם כל ההזמנות הקבועות (בניין אחרי בניין, ואחריהם החיבורים הנפרדים) – ורק אחר כך שתי ההזמנות של החיבור הזמני (חיבור זמני ועע״א).\nהערות ההזמנה באתר מוגבלות ל־100 תווים ונשמרת רק תחילת הטקסט – לכן הסדר קבוע: מספרי ההזמנות הקודמות בפרויקט, ואחריהם שאר הפרטים.\nכתובת החיבור: בוחרים יישוב, משאירים רחוב ומספר ריקים וכותבים את התיאור כפי שמופיע כאן: קוד ראש הצוות בהתחלה, בלי המילה "הזמנה", עד 50 תווים. כתובת ארוכה יותר נחתכה אוטומטית בסופה (מסומן ✂ ליד מספר התווים).'});
   secs.push({title:'חיבור זמני לאתר בנייה', kv: PROJ.temp.size ? [['גודל חיבור זמני',SZ(PROJ.temp.size)],['הזמנה קבועה מקושרת',bldName(PROJ.list[+PROJ.temp.link||0]||{},+PROJ.temp.link||0)],['הזמנות שייפתחו','חיבור זמני · עע״א'],['תכנית מדידה',PROJ.docs.survey.got==='כן'?'התקבלה – '+(PROJ.docs.survey.file||''):'חסרה']] : [['חיבור זמני','אין']]});
   secs.push({title:'הצהרות ואופן השליחה', kv:[
     ...DECL.map(([k,l])=>[l,PROJ.decl[k]?'חיובי – לאשר באתר':'שלילי – לא לאשר']),
@@ -1142,7 +1145,7 @@ function recalc(){
   document.getElementById('totals').innerHTML = `סה״כ ${R.units} דירות · ${connStr(R.byConn)||'אין חיבורים'}${R.kva?` · Σ שיא ביקוש ${fmt(R.kva)} kVA`:''}`;
   const O=buildOrders(), iss=issues(O); LAST={O,iss};
   const ab=O.orders.find(o=>o.bld===PROJ.active); const ae=document.getElementById('addrBld');
-  ae.textContent = ab? ab.addr : '—'; ae.classList.toggle('bad', !!ab && ab.len>50); ae.title = ab? `${ab.len} תווים מתוך 50` : '';
+  ae.textContent = ab? ab.addr : '—'; ae.classList.remove('bad'); ae.title = ab? (ab.cut?`נחתכה ל־${ab.len} תווים. הכתובת המלאה: ${ab.addrFull}`:`${ab.len} תווים מתוך 50`) : '';
   const ts=document.getElementById('tSurvey'); if(ts) ts.textContent = !PROJ.temp.size?'—':(PROJ.docs.survey.got==='כן'?'התקבלה':'חסרה – חובה');
   document.getElementById('status').innerHTML = iss.length
     ? `<div class="status badb"><b>${iss.length} פריטים לטיפול לפני פתיחת ההזמנות</b> – פירוט בסוף המסמך.</div>`
