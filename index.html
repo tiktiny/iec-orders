@@ -265,7 +265,6 @@ main,.imphelp,footer{zoom:var(--fz,1)}
 }
 @media print{.tktop{position:static}.ribbon,.fz,#tkToast,.x,.del,.btn{display:none !important}}
 body.tkprint #inputs,body.tkprint #results>.card~.card,body.tkprint footer{display:none !important}
-@media (min-width:1101px){#projGrid label:has([data-p="gush"]){grid-column:span 2}}
 @media print{#inputs,#results>.card~.card,footer{display:none !important}}
 </style>
 
@@ -391,7 +390,7 @@ body.tkprint #inputs,body.tkprint #results>.card~.card,body.tkprint footer{displ
   <div class="card">
     <h2><span class="num">1</span>פרטי הפרויקט והלקוח המזמין</h2>
     <details class="help"><summary>הסבר</summary><div>
-      הנתונים משמשים לבחירת הלקוח באתר חברת החשמל (שם החברה + ח.פ. יחד), למילוי הכתובת (יישוב, גוש וחלקה) ולניסוח כתובת החיבור של כל הזמנה.<br>
+      הנתונים משמשים לבחירת הלקוח באתר חברת החשמל (שם החברה + ח.פ. יחד), למילוי הכתובת (יישוב, גוש, חלקה ומגרש) ולניסוח כתובת החיבור של כל הזמנה.<br>
       <b>ראש הצוות</b> – הקוד שלו נוסף בסוגריים מרובעים בסוף כתובת החיבור, למשל: הזמנה לבניין A פרויקט נהוראי גוננים ירושלים [רצ7]. חובה לבחור – לא מסיקים מאיש הקשר.<br>
       רחוב ומספר בית – רשות. בפתיחת ההזמנה בוחרים יישוב ומשאירים רחוב ומספר ריקים; הכתובת נכתבת כתיאור חופשי.
     </div></details>
@@ -404,16 +403,14 @@ body.tkprint #inputs,body.tkprint #results>.card~.card,body.tkprint footer{displ
     <h2><span class="num">2</span>נתוני הבניין, קומות ודירות – <span class="bldnm" id="bldTitle"></span></h2>
     <details class="help"><summary>הסבר</summary><div>
       לכל בניין נפתחת הזמנה קבועה נפרדת באתר. מוסיפים בניין בלשונית "＋ בניין", או קולטים את כל הבניינים מקובץ תמהיל (📥 קליטה מקובץ).<br>
-      <b>מיקום מונים</b> – נבחר אוטומטית לפי כלל המשרד: עד 100 דירות – ריכוז מונים (חדר מונים), מעל 100 – פיזור מונים בקומות. אפשר לשנות; הבחירה עוברת במפורש להזמנה באתר.<br>
       <b>קטגוריית הבניין</b> – 3 קטגוריות לפי גובה רצפת קומת המגורים האחרונה: עד 29 מ׳ – בניין נמוך, 29 עד 42 מ׳ – רב קומות, מעל 42 מ׳ – מגדל. נבחר אוטומטית לפי הגובה (אם הגובה לא הוזן – לפי מספר הקומות, כ-2.9 מ׳ לקומה); אפשר ללחוץ ולבחור אחרת.<br>
       <b>חיבור ציבורי</b> – החיבור לשטחים המשותפים של הבניין, נכלל בהזמנה של אותו בניין.<br>
       סה״כ הדירות ופירוט החיבורים מחושבים אוטומטית ממקבצי הקומות.
     </div></details>
-    <div class="grid g4" id="bldGrid">
+    <div class="grid g3" id="bldGrid">
       <label class="f"><span class="lbl">שם בניין / כניסה</span><span class="fld"><input id="building" type="text" title="כך יופיע הבניין בכתובת החיבור, למשל בניין A"></span></label>
       <label class="f"><span class="lbl">מספר קומות מעל קומת קרקע</span><span class="fld"><input id="floors" type="text" inputmode="numeric" title="הקומה העליונה. קומת קרקע = 0"></span></label>
       <label class="f"><span class="lbl">גובה רצפת קומת המגורים האחרונה [מ׳]</span><span class="fld"><input id="height" type="text" inputmode="decimal" title="הגובה הקובע: מרצפת קומת הכניסה (קרקע) עד רצפת קומת המגורים האחרונה. אם ריק – מוערך לפי מספר הקומות (כ-2.9 מ׳ לקומה)"></span></label>
-      <label class="f"><span class="lbl">מיקום מונים</span><span class="fld"><select id="meters" data-def="" title="שדה חובה: ריכוז מונים בחדר מונים או פיזור מונים בקומות – נכתב בתחילת הערות ההזמנה באתר"><option value="">— בחירה (חובה) —</option><option value="ריכוז מונים">ריכוז מונים</option><option value="פיזור מונים">פיזור מונים</option></select></span></label>
     </div>
     <div class="grid g4" style="margin-top:10px">
       <label class="f"><span class="lbl">סה״כ דירות בבניין – מחושב</span><span class="ro hl" id="unitsTotal" title="מחושב אוטומטית ממקבצי הקומות">0</span></label>
@@ -477,7 +474,7 @@ body.tkprint #inputs,body.tkprint #results>.card~.card,body.tkprint footer{displ
     <h2><span class="num">5</span>חיבור זמני לאתר בנייה</h2>
     <details class="help"><summary>הסבר</summary><div>
       חיבור זמני אחד לכל המגרש (3X40 עד 3X910). שדה ריק – אין חיבור זמני.<br>
-      אם נבחר חיבור – אחרי פתיחת כל ההזמנות הקבועות נפתחות שלוש הזמנות: <b>חיבור זמני, עע״א ופירוק חיבור זמני</b>, כולן מקושרות להזמנה הקבועה של הבניין שנבחר. לחיבור זמני חובה תכנית מדידה של האתר.
+      אם נבחר חיבור – אחרי פתיחת כל ההזמנות הקבועות נפתחות שתי הזמנות: <b>חיבור זמני ועע״א</b>, שתיהן מקושרות להזמנה הקבועה של הבניין שנבחר. לחיבור זמני חובה תכנית מדידה של האתר.
     </div></details>
     <div class="grid g4" id="tempGrid"></div>
   </div>
@@ -487,7 +484,7 @@ body.tkprint #inputs,body.tkprint #results>.card~.card,body.tkprint footer{displ
   <div class="card">
     <h2><span class="num">6</span>הצהרות ואופן השליחה</h2>
     <details class="help"><summary>הסבר</summary><div>
-      ההצהרות המסומנות יאושרו באתר אוטומטית בכל ההזמנות, כולל שלוש ההזמנות של החיבור הזמני.<br>
+      ההצהרות המסומנות יאושרו באתר אוטומטית בכל ההזמנות, כולל שתי ההזמנות של החיבור הזמני.<br>
       <b>אופן השליחה:</b> ברירת המחדל – אישור ושליחה אוטומטיים. אפשר לבחור המתנה לבדיקה: מזינים דקות ומה לבצע בסיום.<br>
       העבודה באתר נעשית תמיד תחת טיקטין תכנון חשמל (2003) בע״מ במבט יועץ חשמל, והלקוח נבחר לפי השם והח.פ.
     </div></details>
@@ -530,8 +527,8 @@ body.tkprint #inputs,body.tkprint #results>.card~.card,body.tkprint footer{displ
   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" id="impOk">קליטה לטופס</button><button class="btn" id="impCancel">ביטול</button></div></div></div>
 <footer>טיקטין תכנון חשמל · <span id="ver2"></span></footer>
 <script>
-const VERSION = 'V11';
-const VDATE = '13.11.2026';
+const VERSION = 'V12';
+const VDATE = '24.11.2026';
 const APP_TITLE = 'מסמך פתיחת הזמנות חברת חשמל לפרויקט';
 const APP_SHORT = 'פתיחת הזמנות חח״י';
 const FORMAT_ID = 'tiktin-iec-orders';
@@ -663,7 +660,9 @@ const PROJ_FIELDS = [
   ['city','יישוב','text','נבחר מהרשימה באתר ונכתב גם בתוך כתובת החיבור'],
   ['street','רחוב (רשות)','text','בדרך כלל נשאר ריק – הכתובת נכתבת כתיאור'],
   ['house','מספר / מספרי בית (רשות)','text','בדרך כלל נשאר ריק'],
-  ['gush','גוש וחלקה','text','למשל: גוש 30173 חלקות 267-269 – נכתב בשדות הגוש והחלקה באתר'],
+  ['gush','גוש','num','מספר הגוש בלבד, למשל 30173 – נכתב בשדה הגוש באתר'],
+  ['helka','חלקה','text','מספר החלקה, או כמה חלקות, למשל 267-269 – נכתב בשדה החלקה באתר'],
+  ['migrash','מגרש','text','מספר המגרש – נכתב בשדה המגרש באתר (רשות)'],
   ['contact','איש קשר','text','איש הקשר להזמנה'],
   ['phone','טלפון','num','טלפון איש הקשר'],
   ['email','דוא״ל','text','דוא״ל איש הקשר'],
@@ -692,6 +691,9 @@ function projFrom(o){
   const d=defaultProj(); if(!o||typeof o!=='object') return d;
   const p={...d, ...o};
   p.project={...d.project, ...(o.project||{})}; FIXED_KEYS.forEach(k=>{ if(!String(p.project[k]||'').trim()) p.project[k]=d.project[k]; });
+  { const P=p.project, g=String(P.gush||''); if(/\D/.test(g.replace(/\s/g,'')) && !String(P.helka||'').trim() && !String(P.migrash||'').trim()){   // טופס ישן: "גוש X חלקות Y" בשדה אחד – מפרידים לשלושה שדות
+    const mg=g.match(/גוש\s*([\d]+)/), mh=g.match(/חלק(?:ה|ות)\s*([\d][\d\s,\-–]*)/), mm=g.match(/מגרש\s*([^\s,;]+)/);
+    if(mg||mh||mm){ P.gush=mg?mg[1]:''; P.helka=mh?mh[1].trim():''; P.migrash=mm?mm[1]:''; } } }
   p.list=(Array.isArray(o.list)&&o.list.length?o.list:d.list).map((b,i)=>Object.assign(defaultBuilding(i),b));
   p.active=Math.min(Math.max(0,+o.active||0),p.list.length-1);
   p.extras=Array.isArray(o.extras)?o.extras.map(x=>{ const y=Object.assign(newExtra(),x); if(x.blds!=null&&x.loc==null) y.loc=x.blds; if(y.type==='muni') y.type='public'; if(y.type==='emp') y.type='office'; if(!XTYPES[y.type]) y.type='other'; if(y.type==='park') y.assign='project'; delete y.blds; return y; }):[];
@@ -771,7 +773,7 @@ function renderProject(){
 }
 
 /* ---------- 2. building top ---------- */
-const TOP=['building','floors','height','meters','pub'];
+const TOP=['building','floors','height','pub'];
 function loadTop(){ document.getElementById('pub').innerHTML=sizeOpts(S.pub); TOP.forEach(k=>{ document.getElementById(k).value = S[k]??''; }); }
 TOP.forEach(k=>{ const el=document.getElementById(k);
   bind(el,()=>{ S[k]=el.value; if(k==='building') renderTabs(); recalc(); }); });
@@ -851,7 +853,7 @@ function compute(b){
     units+=c; kva+=c*demand(t.rooms,t.conn).p;
     if(t.conn) byConn[t.conn]=(byConn[t.conn]||0)+c; else noConn+=c;
     const rk=t.rooms?ROOM_LBL[t.rooms]+' חד׳':'ללא חדרים'; byRooms[rk]=(byRooms[rk]||0)+c; }); });
-  const meters = b.meters || '';
+  const meters = '';   // מיקום המונים הוסר מהטופס (בקשת יובל 24.11.2026)
   return {N, gErr, units, kva, byConn, byRooms, noConn, meters, metersAuto:false};
 }
 const connStr = bc => CONNS.filter(c=>bc[c]).map(c=>`${bc[c]} × ${c.toUpperCase()}`).join('; ');
@@ -889,7 +891,7 @@ function locList(withBase){ return `<datalist id="${withBase?'locListB':'locList
 const openSel = x => fld(`<select data-xf="open" data-def="sep" ${canInb(x)?'':'disabled'} title="הזמנה נפרדת, או בתוך ההזמנה של הבניין שבו נמצא החיבור"><option value="sep" ${!xInb(x)?'selected':''}>הזמנה נפרדת</option><option value="inb" ${xInb(x)?'selected':''}>בהזמנת הבניין</option></select>`);
 function pRow(x, ev){
   return `<div class="xrow park" data-p="${ev?'ev':'park'}">
-      <label class="f wide"><span class="lbl">${ev?'טעינת רכבים – תיאור (ריק = אוטומטי)':'תיאור (ריק = אוטומטי)'}</span>${fld(`<input data-xf="desc" value="${esc(x.desc)}" placeholder="${esc(xAuto(x))}" title="יופיע בכתובת החיבור אחרי 'הזמנה ל'">`)}</label>
+      <label class="f wide"><span class="lbl">${ev?'טעינת רכבים – תיאור (ריק = אוטומטי)':'תיאור (ריק = אוטומטי)'}</span>${fld(`<input data-xf="desc" value="${esc(x.desc)}" placeholder="${esc(xAuto(x))}" title="יופיע בתחילת כתובת החיבור">`)}</label>
       <label class="f"><span class="lbl">החיבור יהיה בבניין</span>${fld(`<input data-xf="loc" list="locList" value="${esc(x.loc)}" title="באיזה בניין ימוקם החיבור (לוח / חדר מונים). החיבור משויך לכל הפרויקט">`)}</label>
       <label class="f"><span class="lbl">גודל חיבור</span>${fld(`<select data-xf="size" data-def="" title="${ev?'גודל חיבור הטעינה':'גודל חיבור החניון. ריק = אין חניון משותף'}">${sizeOpts(x.size)}</select>`)}</label>
       ${ev?`<label class="f"><span class="lbl">&nbsp;</span><span class="ro" title="חיבור נפרד לטעינת רכבים – הזמנה נוספת">חיבור טעינה נפרד</span></label>`:`<label class="f"><span class="lbl">טעינת רכבים</span><label class="chk box" title="מסומן = החניון כולל טעינה (ברירת מחדל). ללא סימון – נפתח חיבור נפרד לטעינה"><input type="checkbox" data-xf="evIncl" ${x.evIncl?'checked':''}> החניון כולל טעינה</label></label>`}
@@ -918,7 +920,7 @@ function renderXList(boxId){
       <label class="f"><span class="lbl">סוג</span>${fld(`<select data-xf="type" data-def="com" title="מסחר, משרדים, מבנה ציבור או אחר">${Object.entries(XTYPES).filter(([k])=>k!=='park'&&k!=='ev').map(([k,v])=>`<option value="${k}" ${x.type===k?'selected':''}>${v.l}</option>`).join('')}</select>`)}</label>
       <label class="f"><span class="lbl">מיקום (בניין / מרתף)</span>${fld(`<input data-xf="loc" list="locListB" value="${esc(x.loc)}" title="בניין, כמה בניינים עם + (למשל C+D), או מרתף">`)}</label>
       <label class="f"><span class="lbl">שיוך החיבור</span>${fld(`<select data-xf="assign" data-def="${asgLock(x)||'bld'}" title="${asgLock(x)?'כבר הוזן '+XTYPES[x.type].l+' '+(asgLock(x)==='bld'?'לבניין':'כללי לכל הפרויקט')+' – לא ניתן לשלב לבניין וכללי באותו סוג':'חיבור לבניין שבו נמצא השטח, או חיבור כללי לכל הפרויקט'}"><option value="bld" ${!xOnProj(x)?'selected':''} ${asgLock(x)==='project'?'disabled':''}>לבניין</option><option value="project" ${xOnProj(x)?'selected':''} ${asgLock(x)==='bld'?'disabled':''}>כללי לפרויקט</option></select>`)}</label>
-      <label class="f wide"><span class="lbl">תיאור (ריק = אוטומטי)</span>${fld(`<input data-xf="desc" value="${esc(x.desc)}" placeholder="${esc(xAuto(x))}" title="יופיע בכתובת החיבור אחרי 'הזמנה ל'">`)}</label>
+      <label class="f wide"><span class="lbl">תיאור (ריק = אוטומטי)</span>${fld(`<input data-xf="desc" value="${esc(x.desc)}" placeholder="${esc(xAuto(x))}" title="יופיע בתחילת כתובת החיבור">`)}</label>
       <label class="f"><span class="lbl">גודל חיבור</span>${fld(`<select data-xf="size" data-def="" title="גודל החיבור התלת פאזי">${sizeOpts(x.size)}</select>`)}</label>
       <label class="f"><span class="lbl">כמות</span>${fld(`<input data-xf="qty" inputmode="numeric" value="${esc(x.qty)}" title="מספר חיבורים בגודל זה">`)}</label>
       <label class="f"><span class="lbl">אופן פתיחה</span>${openSel(x)}</label>
@@ -970,8 +972,8 @@ function renderTemp(){
   if(+T.link>=PROJ.list.length) T.link='0';
   g.innerHTML = `
     <label class="f"><span class="lbl">גודל חיבור זמני לכל המגרש</span>${fld(`<select id="tSize" data-def="" title="ריק = אין חיבור זמני">${sizeOpts(T.size,'אין חיבור זמני')}</select>`)}</label>
-    <label class="f"><span class="lbl">הזמנה קבועה לקישור</span>${fld(`<select id="tLink" data-def="0" ${T.size?'':'disabled'} title="שלוש ההזמנות הזמניות מקושרות להזמנה הקבועה של בניין זה">${PROJ.list.map((b,i)=>`<option value="${i}" ${String(T.link)===String(i)?'selected':''}>${esc(bldName(b,i))}</option>`).join('')}</select>`)}</label>
-    <label class="f"><span class="lbl">הזמנות שייפתחו</span><span class="ro" title="נפתחות רק אחרי כל ההזמנות הקבועות">${T.size?'חיבור זמני · עע״א · פירוק':'—'}</span></label>
+    <label class="f"><span class="lbl">הזמנה קבועה לקישור</span>${fld(`<select id="tLink" data-def="0" ${T.size?'':'disabled'} title="שתי ההזמנות הזמניות מקושרות להזמנה הקבועה של בניין זה">${PROJ.list.map((b,i)=>`<option value="${i}" ${String(T.link)===String(i)?'selected':''}>${esc(bldName(b,i))}</option>`).join('')}</select>`)}</label>
+    <label class="f"><span class="lbl">הזמנות שייפתחו</span><span class="ro" title="נפתחות רק אחרי כל ההזמנות הקבועות">${T.size?'חיבור זמני · עע״א':'—'}</span></label>
     <label class="f"><span class="lbl">תכנית מדידה</span><span class="ro" id="tSurvey">—</span></label>`;
   bind(g.querySelector('#tSize'),e=>{ T.size=e.target.value; renderTemp(); recalc(); });
   bind(g.querySelector('#tLink'),e=>{ T.link=e.target.value; recalc(); });
@@ -1036,18 +1038,18 @@ function buildOrders(){
     if(b.pub) parts.push(`ציבורי: 1 × ${b.pub.toUpperCase()}`);
     inc.forEach(x=>parts.push(`${xDesc(x)}: ${Math.max(1,Math.round(num(x.qty,1)))} × ${x.size.toUpperCase()}`));
     const total=R.units+(b.pub?1:0)+inc.reduce((s,x)=>s+Math.max(1,Math.round(num(x.qty,1))),0);
-    const noteHead=R.meters||'מיקום מונים לא נבחר';
+    const noteHead='';
     const noteTail=`${nm}; ${R.units} דירות`+(b.pub?`; ציבורי ${SZ(b.pub)}`:'')+inc.map(x=>`; ${xDesc(x)} ${SZ(x.size)} (שיוך: ${xShiyuch(x)})`).join('')+`; פרויקט ${P.name||''}`;
-    let note=noteHead+'; '+noteTail;
+    let note=noteTail;
     const items=CONNS.filter(c=>R.byConn[c]).map(c=>({what:'דירות', size:c.toUpperCase(), qty:R.byConn[c]}));
     Object.keys(R.byConn).filter(c=>!CONNS.includes(c)).forEach(c=>items.push({what:'דירות', size:c.toUpperCase(), qty:R.byConn[c]}));
     if(b.pub) items.push({what:'ציבורי', size:b.pub.toUpperCase(), qty:1});
     inc.forEach(x=>items.push({what:xDesc(x), size:x.size.toUpperCase(), qty:Math.max(1,Math.round(num(x.qty,1)))}));
-    out.push({kind:'קבועה – מגורים', type:'res', target:nm, addr:'הזמנה ל'+nm+tail, meters:R.meters||'—', conns:parts.join('; '), total, note, noteHead, noteTail, bld:i, units:R.units, items});
+    out.push({kind:'קבועה – מגורים', type:'res', target:nm, addr:nm+tail, meters:R.meters||'—', conns:parts.join('; '), total, note, noteHead, noteTail, bld:i, units:R.units, items});
   });
   [...PROJ.extras.filter(x=>!xInb(x)), ...parkItems().filter(x=>!xInb(x)&&x.size)].forEach(x=>{
     const q=Math.max(1,Math.round(num(x.qty,1))), d=xDesc(x);
-    out.push({kind:'קבועה – חיבור נפרד', type:'sep', target:d, addr:'הזמנה ל'+d+tail, meters:'—', conns:x.size?`${q} × ${x.size.toUpperCase()}`:'', total:q, items:x.size?[{what:typeLbl(x), size:x.size.toUpperCase(), qty:q}]:[], xtLbl:typeLbl(x),
+    out.push({kind:'קבועה – חיבור נפרד', type:'sep', target:d, addr:d+tail, meters:'—', conns:x.size?`${q} × ${x.size.toUpperCase()}`:'', total:q, items:x.size?[{what:typeLbl(x), size:x.size.toUpperCase(), qty:q}]:[], xtLbl:typeLbl(x),
       noteHead:'', noteTail:`${typeLbl(x)}; מיקום: ${xLocTxt(x)}; שיוך: ${xShiyuch(x)}`+(x.note?'; '+x.note:'')+`; פרויקט ${P.name||''}`, xt:x.type});
     out[out.length-1].note=out[out.length-1].noteTail;
   });
@@ -1058,7 +1060,6 @@ function buildOrders(){
     const link=`הזמנה קבועה של ${ln} (מס׳ ${li+1} ברשימה)`;
     out.push({kind:'חיבור זמני', type:'temp', size:PROJ.temp.size.toUpperCase(), target:'כל המגרש', addr:'חיבור זמני למגרש'+tail, meters:'—', conns:`1 × ${PROJ.temp.size.toUpperCase()}`, total:1, note:`חיבור זמני לאתר בנייה; לקשר ל${link}; לצרף תכנית מדידה`, link:li});
     out.push({kind:'עע״א', type:'infra', target:'כל המגרש', addr:'עע״א לחיבור זמני למגרש'+tail, meters:'—', conns:'עבודה בתשתית – לפי האתר', total:0, note:`עע״א לחיבור הזמני; לקשר ל${link}`, link:li});
-    out.push({kind:'פירוק חיבור זמני', type:'remove', size:PROJ.temp.size.toUpperCase(), target:'כל המגרש', addr:'פירוק חיבור זמני למגרש'+tail, meters:'—', conns:`פירוק 1 × ${PROJ.temp.size.toUpperCase()}`, total:0, note:`פירוק החיבור הזמני; לקשר ל${link}`, link:li});
   }
   out.forEach((o,i)=>{ o.seq=i+1; o.len=o.addr.length; o.perm=i<nPerm; });
   return {orders:out, calcs};
@@ -1067,7 +1068,7 @@ function buildOrders(){
 /* ---------- issues ---------- */
 function issues(O){
   const P=PROJ.project, out=[];
-  const need=[['name','שם הפרויקט'],['client','שם חברת הלקוח'],['hp','ח.פ. של הלקוח'],['city','יישוב'],['gush','גוש וחלקה'],['contact','איש קשר'],['phone','טלפון'],['email','דוא״ל'],['leader','ראש צוות מטפל']];
+  const need=[['name','שם הפרויקט'],['client','שם חברת הלקוח'],['hp','ח.פ. של הלקוח'],['city','יישוב'],['gush','גוש'],['helka','חלקה'],['contact','איש קשר'],['phone','טלפון'],['email','דוא״ל'],['leader','ראש צוות מטפל']];
   const miss=need.filter(([k])=>!String(P[k]||'').trim()).map(([,l])=>l); if(miss.length) out.push('חסרים פרטי פרויקט: '+miss.join(', '));
   if(P.hp && !/^\d{9}$/.test(String(P.hp).replace(/\D/g,''))) out.push('ח.פ. צריך להיות 9 ספרות');
   PROJ.list.forEach((b,i)=>{ const R=O.calcs[i], nm=bldName(b,i);
@@ -1075,7 +1076,6 @@ function issues(O){
     if(R.noConn) out.push(`${nm}: ${R.noConn} דירות ללא גודל חיבור`);
     R.gErr.forEach((g,gi)=>{ if(g&&g.err) out.push(`${nm}: מקבץ ${gi+1} – ${g.err}`); });
     if(!b.pub) out.push(`${nm}: לא נבחר חיבור ציבורי`);
-    if(!b.meters) out.push(`${nm}: לא נבחר מיקום מונים (ריכוז / פיזור) – שדה חובה`);
   });
   const names=PROJ.list.map(bldName); names.forEach((n,i)=>{ if(names.indexOf(n)!==i) out.push(`שם בניין כפול: ${n}`); });
   PROJ.extras.forEach((x,i)=>{ const d=xDesc(x), k=isPark(x)?'חיבור חניון':'חיבור';
@@ -1087,7 +1087,7 @@ function issues(O){
     if(!pk.evIncl && !pk.ev.size) out.push('טעינת רכבים בחיבור נפרד: לא נבחר גודל חיבור');
     parkItems().forEach(x=>{ if(String(x.loc||'').trim() && bldIndexOf(x.loc)<0) out.push(`${typeLbl(x)}: הבניין "${x.loc}" לא קיים בלשוניות`); }); }
   ['com','office','public','other'].forEach(t=>{ const r=PROJ.extras.filter(x=>x.type===t); if(r.some(xOnProj)&&r.some(x=>!xOnProj(x))) out.push(`${XTYPES[t].l}: הוזנו גם חיבור לבניין וגם חיבור כללי לכל הפרויקט – יש לבחור אחד מהשניים`); });
-  O.orders.forEach(o=>{ if(o.len>100) out.push(`כתובת החיבור של "${o.target}" (${o.kind}) ארוכה מ־100 תווים (${o.len}) – המתכנן יחליט מה להשמיט; אין קיצור אוטומטי`); });
+  O.orders.forEach(o=>{ if(o.len>50) out.push(`כתובת החיבור של "${o.target}" (${o.kind}) ארוכה מ־50 תווים (${o.len}) – המתכנן יחליט מה להשמיט; אין קיצור אוטומטי`); });
   ['decl','plan','poa'].forEach(k=>{ if(PROJ.docs[k].got!=='כן') out.push('מסמך חובה לא התקבל: '+DOCS.find(d=>d.k===k).l); });
   if(PROJ.temp.size && PROJ.docs.survey.got!=='כן') out.push('יש חיבור זמני – חובה תכנית מדידה של האתר');
   if(PROJ.send.mode==='wait' && !(num(PROJ.send.wait)>0)) out.push('נבחרה המתנה לבדיקה – יש להזין זמן המתנה בדקות');
@@ -1103,23 +1103,23 @@ function sections(O, iss){
   const secs=[];
   secs.push({title:'פרטי הפרויקט והלקוח', kv:[
     ['שם הפרויקט',P.name||'–'],['מספר פרויקט',P.num||'–'],['שם חברת הלקוח',P.client||'–'],['ח.פ. של הלקוח',P.hp||'–'],
-    ['יישוב',P.city||'–'],['רחוב ומספר בית',[P.street,P.house].filter(Boolean).join(' ')||'– (נשאר ריק באתר)'],['גוש וחלקה',P.gush||'–'],
+    ['יישוב',P.city||'–'],['רחוב ומספר בית',[P.street,P.house].filter(Boolean).join(' ')||'– (נשאר ריק באתר)'],['גוש',P.gush||'–'],['חלקה',P.helka||'–'],['מגרש',P.migrash||'–'],
     ['איש קשר',P.contact||'–'],['טלפון',P.phone||'–'],['דוא״ל',P.email||'–'],['ראש צוות מטפל',P.leader?`${P.leader} – [${code}]`:'–'],['טלפון לקבלת SMS מחברת החשמל',P.sms||'–'],
     ['חשבון העבודה באתר','טיקטין תכנון חשמל (2003) בע״מ · מבט יועץ חשמל']]});
   secs.push({title:'סיכום', kpi:[['הזמנות לפתיחה',ord.length],['הזמנות קבועות',perm],['בניינים',PROJ.list.length],['סה״כ דירות',units],['סה״כ חיבורים',conns]]});
-  secs.push({title:'בניינים ודירות', head:['בניין','קומות','דירות','מיקום מונים','3X25','3X40','3X63','3X80','3X100','אחר','חיבור ציבורי'],
+  secs.push({title:'בניינים ודירות', head:['בניין','קומות','דירות','3X25','3X40','3X63','3X80','3X100','אחר','חיבור ציבורי'],
     rows:PROJ.list.map((b,i)=>{ const R=O.calcs[i]; const other=Object.entries(R.byConn).filter(([c])=>!['3x25','3x40','3x63','3x80','3x100'].includes(c)).map(([c,n])=>`${n}×${c.toUpperCase()}`).join(' ');
-      return [bldName(b,i), R.N, R.units, R.meters, R.byConn['3x25']||'', R.byConn['3x40']||'', R.byConn['3x63']||'', R.byConn['3x80']||'', R.byConn['3x100']||'', other, b.pub?b.pub.toUpperCase():'–']; }),
-    note:'מיקום המונים (ריכוז / פיזור) נבחר בטופס לכל בניין – שדה חובה – ונכתב בתחילת הערות ההזמנה באתר.'});
+      return [bldName(b,i), R.N, R.units, R.byConn['3x25']||'', R.byConn['3x40']||'', R.byConn['3x63']||'', R.byConn['3x80']||'', R.byConn['3x100']||'', other, b.pub?b.pub.toUpperCase():'–']; }),
+    note:'החיבור הציבורי של כל בניין נכלל בהזמנה של אותו בניין.'});
   const repX=[...parkItems().filter(x=>x.size), ...PROJ.extras];
   if(repX.length) secs.push({title:'חניון, מסחר, משרדים ומבני ציבור', head:['סוג','מיקום','שיוך החיבור','תיאור','גודל','כמות','אופן פתיחה','הערות'],
     rows:repX.map(x=>[typeLbl(x), xLocTxt(x), xShiyuch(x), xDesc(x), x.size?x.size.toUpperCase():'–', Math.max(1,Math.round(num(x.qty,1))), xInb(x)?'בהזמנת הבניין':'הזמנה נפרדת', x.note||'–']), wide:3});
   const RES=(PROJ.iec&&PROJ.iec.orders)||[]; const resOf=o=>RES.find(r=>r.seq===o.seq&&r.target===o.target);
   const hasRes=RES.some(r=>r.number||r.status!=='ממתין');
-  secs.push({title:'רשימת ההזמנות לפתיחה – לפי הסדר', head:['#','סוג ההזמנה','מיועדת ל־','כתובת החיבור (תיאור)','תווים','מיקום מונים','פירוט חיבורים','הערות להזמנה',...(hasRes?['מספר הזמנה']:[])],
-    rows:ord.map(o=>{ const r=resOf(o); return [o.seq,o.kind,o.target,o.addr,o.len>100?o.len+' ⚠':o.len,o.meters,o.conns||'–',o.note,...(hasRes?[r?(r.number||r.status):'–']:[])]; }), wide:3, small:true,
-    note:'סדר הפתיחה: קודם כל ההזמנות הקבועות (בניין אחרי בניין, ואחריהם החיבורים הנפרדים) – ורק אחר כך שלוש ההזמנות של החיבור הזמני.\nהערות ההזמנה באתר מוגבלות ל־100 תווים ונשמרת רק תחילת הטקסט – לכן הסדר קבוע: מיקום המונים, מספרי ההזמנות הקודמות בפרויקט, ואחריהם שאר הפרטים.\nכתובת החיבור: בוחרים יישוב, משאירים רחוב ומספר ריקים וכותבים את התיאור כפי שמופיע כאן. אם האתר דוחה את האורך – עוצרים והמתכנן מחליט מה להשמיט.'});
-  secs.push({title:'חיבור זמני לאתר בנייה', kv: PROJ.temp.size ? [['גודל חיבור זמני',SZ(PROJ.temp.size)],['הזמנה קבועה מקושרת',bldName(PROJ.list[+PROJ.temp.link||0]||{},+PROJ.temp.link||0)],['הזמנות שייפתחו','חיבור זמני · עע״א · פירוק חיבור זמני'],['תכנית מדידה',PROJ.docs.survey.got==='כן'?'התקבלה – '+(PROJ.docs.survey.file||''):'חסרה']] : [['חיבור זמני','אין']]});
+  secs.push({title:'רשימת ההזמנות לפתיחה – לפי הסדר', head:['#','סוג ההזמנה','מיועדת ל־','כתובת החיבור (תיאור)','תווים','פירוט חיבורים','הערות להזמנה',...(hasRes?['מספר הזמנה']:[])],
+    rows:ord.map(o=>{ const r=resOf(o); return [o.seq,o.kind,o.target,o.addr,o.len>50?o.len+' ⚠':o.len,o.conns||'–',o.note,...(hasRes?[r?(r.number||r.status):'–']:[])]; }), wide:3, small:true,
+    note:'סדר הפתיחה: קודם כל ההזמנות הקבועות (בניין אחרי בניין, ואחריהם החיבורים הנפרדים) – ורק אחר כך שתי ההזמנות של החיבור הזמני (חיבור זמני ועע״א).\nהערות ההזמנה באתר מוגבלות ל־100 תווים ונשמרת רק תחילת הטקסט – לכן הסדר קבוע: מספרי ההזמנות הקודמות בפרויקט, ואחריהם שאר הפרטים.\nכתובת החיבור: בוחרים יישוב, משאירים רחוב ומספר ריקים וכותבים את התיאור כפי שמופיע כאן – עד 50 תווים, בלי המילה "הזמנה". אם האתר דוחה את האורך – עוצרים והמתכנן מחליט מה להשמיט.'});
+  secs.push({title:'חיבור זמני לאתר בנייה', kv: PROJ.temp.size ? [['גודל חיבור זמני',SZ(PROJ.temp.size)],['הזמנה קבועה מקושרת',bldName(PROJ.list[+PROJ.temp.link||0]||{},+PROJ.temp.link||0)],['הזמנות שייפתחו','חיבור זמני · עע״א'],['תכנית מדידה',PROJ.docs.survey.got==='כן'?'התקבלה – '+(PROJ.docs.survey.file||''):'חסרה']] : [['חיבור זמני','אין']]});
   secs.push({title:'הצהרות ואופן השליחה', kv:[
     ...DECL.map(([k,l])=>[l,PROJ.decl[k]?'חיובי – לאשר באתר':'שלילי – לא לאשר']),
     ['מצב העבודה לפני השליחה',PROJ.send.mode==='wait'?`המתנה ${num(PROJ.send.wait)} דקות לבדיקה, ואז: ${PROJ.send.after}`:'אישור ושליחה אוטומטיים ללא בדיקה']]});
@@ -1137,13 +1137,12 @@ function recalc(){
   S.groups.forEach((g,gi)=>g.types.forEach((t,ti)=>{ const el=document.getElementById(`sub${gi}_${ti}`); if(el){ const d=demand(t.rooms,t.conn); el.innerHTML = d.p? `<span title="שיא ביקוש לדירה לפי חח״י${d.subst?' – צירוף לא קיים בטבלה, נלקח מהשורה הקרובה':''}">(${fmt(d.p)} kVA${d.subst?' ✱':''})</span>` : ''; } }));
   document.getElementById('bldTitle').textContent = bldName(S,PROJ.active);
   document.getElementById('unitsTotal').textContent = R.units;
-  document.getElementById('meters').classList.toggle('bad', !R.meters);
   drawCat();
   document.getElementById('connsTotal').textContent = connStr(R.byConn) || '—';
   document.getElementById('totals').innerHTML = `סה״כ ${R.units} דירות · ${connStr(R.byConn)||'אין חיבורים'}${R.kva?` · Σ שיא ביקוש ${fmt(R.kva)} kVA`:''}`;
   const O=buildOrders(), iss=issues(O); LAST={O,iss};
   const ab=O.orders.find(o=>o.bld===PROJ.active); const ae=document.getElementById('addrBld');
-  ae.textContent = ab? ab.addr : '—'; ae.classList.toggle('bad', !!ab && ab.len>100); ae.title = ab? `${ab.len} תווים` : '';
+  ae.textContent = ab? ab.addr : '—'; ae.classList.toggle('bad', !!ab && ab.len>50); ae.title = ab? `${ab.len} תווים מתוך 50` : '';
   const ts=document.getElementById('tSurvey'); if(ts) ts.textContent = !PROJ.temp.size?'—':(PROJ.docs.survey.got==='כן'?'התקבלה':'חסרה – חובה');
   document.getElementById('status').innerHTML = iss.length
     ? `<div class="status badb"><b>${iss.length} פריטים לטיפול לפני פתיחת ההזמנות</b> – פירוט בסוף המסמך.</div>`
@@ -1198,7 +1197,7 @@ function goState(key){
       label:`${P.name||''} – ${bldName(b,i)}`};
   }
   if(key==='shaft'){
-    let idx=PROJ.list.map((b,j)=>j).filter(j=>compute(PROJ.list[j]).meters==='פיזור מונים');
+    let idx=PROJ.list.map((b,j)=>j).filter(j=>compute(PROJ.list[j]).units>100);
     if(!idx.length) idx=PROJ.list.map((b,j)=>j);
     return {project:P.name||'', active:Math.max(0,idx.indexOf(i)), list:idx.map(j=>{ const bb=PROJ.list[j];
       return {project:P.name||'', building:bldName(bb,j), floors:compute(bb).N, jordan:'no',
@@ -1210,7 +1209,7 @@ function goState(key){
       buildings:PROJ.list.map((bb,j)=>{ const RR=compute(bb), cat=catEff(bb), cs=bldConns(j,['com','office','other']), m={};
         cs.forEach(z=>m[z]=(m[z]||0)+1);
         return {name:locShort(bldName(bb,j)), cat, units:String(RR.units||''), floors:String(RR.N||''), perFloor:String(perFloorOf(bb)),
-          meters:RR.meters==='פיזור מונים'?'floors':'down', pubSize:(cat==='low'&&['3X40','3X63','3X80','3X100'].includes(UP(bb.pub)))?UP(bb.pub):'',
+          meters:RR.units>100?'floors':'down', pubSize:(cat==='low'&&['3X40','3X63','3X80','3X100'].includes(UP(bb.pub)))?UP(bb.pub):'',
           com:cs.length>0, comConns:cs.length?Object.entries(m).map(([sz,n])=>({sz,n:String(n)})):[{sz:'3X25',n:'1'}], ccTouched:cs.length>0}; }),
       parking:{has:!!PROJ.park.size, baseBld:pIdx, baseSize:PROJ.park.size?UP(PROJ.park.size):'3X400'}};
   }
@@ -1976,7 +1975,7 @@ document.getElementById('bLoad').addEventListener('click',e=>{ TK.menu(e.current
 document.getElementById('bCheck').addEventListener('click',e=>{ recalc();
   document.querySelectorAll('.tkmiss').forEach(x=>x.classList.remove('tkmiss'));
   const iss=LAST.iss, P=PROJ.project, miss=[];
-  ['name','client','hp','city','gush','contact','phone','email','leader'].forEach(k=>{ if(!String(P[k]||'').trim()){ const el=document.querySelector('#projGrid [data-p="'+k+'"]'); if(el) miss.push(el); } });
+  ['name','client','hp','city','gush','helka','contact','phone','email','leader'].forEach(k=>{ if(!String(P[k]||'').trim()){ const el=document.querySelector('#projGrid [data-p="'+k+'"]'); if(el) miss.push(el); } });
   const mt=document.getElementById('meters'); if(mt && !mt.value) miss.push(mt);
   miss.forEach(el=>{ const f=el.closest('.fld')||el; f.classList.add('tkmiss'); const off=()=>{ if(el.value) f.classList.remove('tkmiss'); }; el.addEventListener('input',off); el.addEventListener('change',off); });
   if(!iss.length){ TK.toast('הטופס שלם – אין פריטים לטיפול'); return; }
@@ -1987,15 +1986,15 @@ document.getElementById('bCheck').addEventListener('click',e=>{ recalc();
 document.getElementById('bSample').addEventListener('click',()=>{
   if(!formEmpty() && !confirm('מילוי הדוגמה יחליף את הנתונים שבטופס. להמשיך?\n(אפשר לחזור אחורה בכפתור "ביטול פעולה")')) return;
   const T=(count,rooms,area)=>({count:String(count), rooms, area:String(area), conn:defaultConn(rooms,area)||'', auto:true});
-  PROJ=projFrom({project:{name:'פרויקט לדוגמה', num:'00000', client:'חברת הדוגמה בע״מ', hp:'510000000', city:'תל אביב', gush:'גוש 1234 חלקות 56-57', contact:'ישראל ישראלי', phone:'050-0000000', email:'example@example.co.il', leader:LEADERS[0][0]},
+  PROJ=projFrom({project:{name:'פרויקט לדוגמה', num:'00000', client:'חברת הדוגמה בע״מ', hp:'510000000', city:'תל אביב', gush:'1234', helka:'56-57', migrash:'101', contact:'ישראל ישראלי', phone:'050-0000000', email:'example@example.co.il', leader:LEADERS[0][0]},
     list:[{building:'בניין A', floors:'8', height:'26', meters:'ריכוז מונים', pub:'3x63', groups:[{from:'1',to:'8',types:[T(2,'4',100),T(2,'5',120)]}]},
           {building:'בניין B', floors:'12', height:'38', meters:'פיזור מונים', pub:'3x80', groups:[{from:'1',to:'11',types:[T(4,'4',105)]},{from:'12',to:'12',types:[T(2,'6',160)]}]}],
     temp:{size:'3x250', link:'0'}});
   S=PROJ.list[0]; fullRender(); TK.toast('הטופס מולא בפרויקט לדוגמה');
 });
 document.getElementById('bDup').addEventListener('click',()=>{
-  if(!confirm('לפתוח פרויקט חדש על בסיס הטופס הנוכחי?\nהבניינים והחיבורים נשארים. שם הפרויקט, מספר הפרויקט, גוש וחלקה, כתובת, מספרי ההזמנות והמסמכים המצורפים מתנקים.')) return;
-  const o=JSON.parse(JSON.stringify(PROJ)); ['name','num','gush','street','house'].forEach(k=>o.project[k]=''); o.ordNo={}; delete o.iec; delete o.docs;
+  if(!confirm('לפתוח פרויקט חדש על בסיס הטופס הנוכחי?\nהבניינים והחיבורים נשארים. שם הפרויקט, מספר הפרויקט, גוש, חלקה, מגרש, כתובת, מספרי ההזמנות והמסמכים המצורפים מתנקים.')) return;
+  const o=JSON.parse(JSON.stringify(PROJ)); ['name','num','gush','helka','migrash','street','house'].forEach(k=>o.project[k]=''); o.ordNo={}; delete o.iec; delete o.docs;
   PROJ=projFrom(o); S=PROJ.list[PROJ.active]; idbClear(); DOCSTORE={}; fullRender();
   const el=document.querySelector('#projGrid [data-p="name"]'); if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.focus(); }
   TK.toast('נפתח פרויקט חדש על בסיס הקודם – יש למלא את פרטי הפרויקט');
